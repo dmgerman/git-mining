@@ -28,7 +28,6 @@ git  log  --help
 :
 #+END_SRC
 
-#+RESULTS:
 #+BEGIN_EXAMPLE
 GIT-LOG(1)                        Git Manual                        GIT-LOG(1)
 
@@ -1953,7 +1952,7 @@ Git 2.7.4                         03/23/2016                        GIT-LOG(1)
 git -C  /tmp/jruby log -1 | head
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 45e17306aa870f25094ebc4956e1b03ba12b24e7
 Merge: 0f717cf 92aa13a
@@ -1976,7 +1975,7 @@ Date:   Wed Aug 17 16:13:05 2016 -0500
 git -C  /tmp/jruby log -1 --no-abbrev| head
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 45e17306aa870f25094ebc4956e1b03ba12b24e7
 Merge: 0f717cf68d04824bfd5d1c66bcc40012176b15d1 92aa13a6245ee7e1ab94011191bc5bb594a1fd04
@@ -1995,7 +1994,7 @@ Date:   Wed Aug 17 16:13:05 2016 -0500
 git -C  /tmp/jruby log --oneline  | head
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 45e1730 Merge pull request #4078 from etehtsea/bump-racc
 0f717cf Merge pull request #4085 from etehtsea/rm-lib-gitignore
@@ -2045,7 +2044,7 @@ while (<>) {
 git -C /tmp/jruby log -1  | perl withCid.pl 
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 45e17306aa870f25094ebc4956e1b03ba12b24e7;
 45e17306aa870f25094ebc4956e1b03ba12b24e7;Merge;0f717cf 92aa13a
@@ -2063,7 +2062,7 @@ So now  we can extract any information we want:
 git -C /tmp/jruby log -6  | perl withCid.pl | grep ';Author;' 
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 45e17306aa870f25094ebc4956e1b03ba12b24e7;Author;Charles Oliver Nutter <headius@headius.com>
 0f717cf68d04824bfd5d1c66bcc40012176b15d1;Author;Charles Oliver Nutter <headius@headius.com>
@@ -2079,7 +2078,7 @@ or you can learn how to do it via the format field
 git -C /tmp/jruby log -6  --format='%H;%an'
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 45e17306aa870f25094ebc4956e1b03ba12b24e7;Charles Oliver Nutter
 0f717cf68d04824bfd5d1c66bcc40012176b15d1;Charles Oliver Nutter
@@ -2094,7 +2093,7 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;Charles Oliver Nutter
 git -C /tmp/jruby log -6  --format='%H;Commiter;%cn; CommiterDate;%ct'
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 45e17306aa870f25094ebc4956e1b03ba12b24e7;Commiter;GitHub; CommiterDate;1471468385
 0f717cf68d04824bfd5d1c66bcc40012176b15d1;Commiter;GitHub; CommiterDate;1471467486
@@ -2121,7 +2120,7 @@ git clone http://github.com/dmgerman/xournal
 git -C /tmp/xournal branch
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 * master
 #+end_example
@@ -2138,7 +2137,7 @@ Then you have a file: .git/FETCH_HEAD that contains all information of branches
 cat /tmp/xournal/.git/FETCH_HEAD
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 03b7651644aea0a95fd09f1566d4a667df8d7950		branch 'master' of http://github.com/dmgerman/xournal
 aaa50b9cc7efadea40bc812cd3dfb08d446b79a2	not-for-merge	branch 'a5paper' of http://github.com/dmgerman/xournal
@@ -2171,7 +2170,7 @@ By default, git log gives you the log of the "current" branch
 git -C /tmp/xournal log  -1
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 03b7651644aea0a95fd09f1566d4a667df8d7950
 Author: D German <dmg@uvic.ca>
@@ -2187,7 +2186,7 @@ but git log --glob='*' gives you _all_ commits
 git -C /tmp/xournal log --glob='*' -2
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit c08da1d700a818cada297aee949b40da780b536e
 Merge: 661075a 03b7651
@@ -2209,7 +2208,7 @@ or a specific branch: use origin to indicate that it is the branch upstream
 git -C /tmp/xournal log origin/mru -2
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 69749f060959c32009c13f51f25f4cfdcdb3da8b
 Author: Daniel M German <dmg@uvic.ca>
@@ -2240,7 +2239,7 @@ The DAG is the fundamental data structure of git
 git -C /tmp/xournal log --pretty='%H;%P' -n 5 origin/next
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 c08da1d700a818cada297aee949b40da780b536e;661075ab91e296fb5b702be379967bd581290942 03b7651644aea0a95fd09f1566d4a667df8d7950
 03b7651644aea0a95fd09f1566d4a667df8d7950;addb9bf2c0be2ff61e72d3c565253d319311d2f8
@@ -2263,7 +2262,7 @@ addb9bf2c0be2ff61e72d3c565253d319311d2f8;f28489f7f7477e59a9015e17a795c88ab89d977
 git -C /tmp/xournal log --merges -5 --glob='*' --pretty='%H;%P'
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 c08da1d700a818cada297aee949b40da780b536e;661075ab91e296fb5b702be379967bd581290942 03b7651644aea0a95fd09f1566d4a667df8d7950
 661075ab91e296fb5b702be379967bd581290942;ae37e72839ae59308974b9375eae0c8630c4795c addb9bf2c0be2ff61e72d3c565253d319311d2f8
@@ -2276,7 +2275,7 @@ ceef9524bc5be69c1ae26985f47cbd96d49066cf;59c4b8f96d0d5ab9b26324976358ec4fbfa255e
 git -C /tmp/xournal log --pretty='%H;%P' | tail -5
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 bdd9b21324587503275e285acdf9ba19c82d83b8;bcdd3a0382ffaa7fb9e117500403a6360b2ef5b2
 bcdd3a0382ffaa7fb9e117500403a6360b2ef5b2;1aaa40619a8afc55fdd4d6fe4f883aa0cf237bd3
@@ -2294,7 +2293,7 @@ bcdd3a0382ffaa7fb9e117500403a6360b2ef5b2;1aaa40619a8afc55fdd4d6fe4f883aa0cf237bd
 git  -C /tmp/xournal log -5 --numstat 
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 03b7651644aea0a95fd09f1566d4a667df8d7950
 Author: D German <dmg@uvic.ca>
@@ -2352,7 +2351,7 @@ Several issues:
 git  -C /tmp/xournal log -3 --no-abbrev --raw 
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 03b7651644aea0a95fd09f1566d4a667df8d7950
 Author: D German <dmg@uvic.ca>
@@ -2409,7 +2408,7 @@ git  -C /tmp/jruby log --no-abbrev --raw --merges --glob='*' | head
 #+END_SRC
 
 
-#+RESULTS:
+
 #+begin_example
 commit 45e17306aa870f25094ebc4956e1b03ba12b24e7
 Merge: 0f717cf68d04824bfd5d1c66bcc40012176b15d1 92aa13a6245ee7e1ab94011191bc5bb594a1fd04
@@ -2432,7 +2431,7 @@ commit 0f717cf68d04824bfd5d1c66bcc40012176b15d1
 git  -C /tmp/xournal log -1 --no-abbrev --raw 
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 03b7651644aea0a95fd09f1566d4a667df8d7950
 Author: D German <dmg@uvic.ca>
@@ -2451,7 +2450,7 @@ You can extract the contents of file in two ways:
 git -C /tmp/xournal show 03b7651644aea0a95fd09f1566d4a667df8d7950:README.org | head
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 #+STARTUP: showall
 
@@ -2471,7 +2470,7 @@ It should *not be used* for code intended for further distribution.
 git -C /tmp/xournal show 7f2fe5eed121663f434adbea6d292e35471330f5 | head
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 #+STARTUP: showall
 
@@ -2510,7 +2509,7 @@ $len = length($contents);
 print sha1_hex("blob $len\0$contents");
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 7f2fe5eed121663f434adbea6d292e35471330f5
 #+end_example
@@ -2519,7 +2518,7 @@ print sha1_hex("blob $len\0$contents");
 git -C /tmp/xournal  log --no-abbrev -1 --raw README.org 
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 commit 03b7651644aea0a95fd09f1566d4a667df8d7950
 Author: D German <dmg@uvic.ca>
@@ -2539,7 +2538,7 @@ git blame
 git -C /tmp/xournal blame src/xo-file.c | head
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    1) /*
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    2)  *  This program is free software; you can redistribute it and/or
@@ -2578,7 +2577,7 @@ James Ketrenos <jketreno@io.(none)>
 git -C /tmp/jruby log -6  --format='%H;author;%an;mailmapAuthor;%aN'
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 45e17306aa870f25094ebc4956e1b03ba12b24e7;author;Charles Oliver Nutter;mailmapAuthor;Charles Oliver Nutter
 0f717cf68d04824bfd5d1c66bcc40012176b15d1;author;Charles Oliver Nutter;mailmapAuthor;Charles Oliver Nutter
@@ -2595,7 +2594,7 @@ Another alternative: simply map cid to metadata
 git -C /tmp/xournal blame --no-abbrev src/xo-file.c --line-porcelain | head -26
 #+END_SRC
 
-#+RESULTS:
+
 #+begin_example
 a71d76854d1caabd6bcc7fd1ce6a105fca06de61 1 1 15
 author Denis Auroux
