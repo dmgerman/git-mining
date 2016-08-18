@@ -573,6 +573,7 @@ but only when the merge included a patch
 
 - Easier to parse
 - but it does not track renames (files appear deleted and added)
+  - unless it is run with one filename and --follow (see below)
 
 #+BEGIN_SRC sh
 git  -C /tmp/jruby log --oneline --no-abbrev --name-status -5
