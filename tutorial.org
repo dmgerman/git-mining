@@ -718,8 +718,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --raw --follow truffle/src/main/jav
 
 - Git stores the actual contents of the files: the blobs
 - *do not extract using git checkout*. it is very slow
-- The --raw gives you the blob of a given file
-- You need to use the filename at the time of the commit (in case it was later renamed)
+- The --raw option gives you the blob of a given file before and after the commit is executed:
 
 #+BEGIN_SRC sh
 git  -C /tmp/xournal log -1 --no-abbrev --raw 
@@ -739,6 +738,8 @@ Date:   Wed Apr 20 11:04:36 2016 +0200
 You can extract the contents of file in two ways: 
 
 ** by cid:filename
+
+- You need to use the filename at the time of the commit (in case it was later renamed)
 
 #+BEGIN_SRC sh
 git -C /tmp/xournal show 03b7651644aea0a95fd09f1566d4a667df8d7950:README.org | head
@@ -826,7 +827,10 @@ Date:   Wed Apr 20 11:04:36 2016 +0200
 
 * What about who has modified a given file?
 
-git blame
+git blame. It is very slow. It gives you the blame with respect to the current commit (head of the current branch). So
+make sure you run it after a checkout at the time you want to see the blame.
+
+By default is format is hard to parse:
 
 #+BEGIN_SRC sh
 git -C /tmp/xournal blame src/xo-file.c | head
@@ -845,13 +849,6 @@ a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    8)  *  but WITHOUT ANY WARRA
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    9)  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000   10)  *  General Public License for more details.
 #+end_example
-
-the format is not very nice
-
-| time     | unix time in epoch                                               |
-| summary  | one liner of commit log                                          |
-| filename | if file was renamed, it tells you what the original filename was |
-| \tab     | actual content is preceeded by tab                               |
 
 It is also dangerous to use:
 
@@ -890,6 +887,13 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;author;Charles Oliver Nutter;mailmapAut
 
 
 Another alternative: use porcelain (you also get the previous commit id for every line)
+
+| (author or commiter)-time | unix time in epoch                                               |
+| summary                   | one liner of commit log                                          |
+| filename                  | if file was renamed, it tells you what the original filename was |
+| previous                  | commit responsible for the previous version of a specific line   |
+| \tab                      | actual content is preceeded by tab                               |
+
 
 #+BEGIN_SRC sh
 git -C /tmp/xournal blame --no-abbrev src/xo-file.c --line-porcelain | head -26
