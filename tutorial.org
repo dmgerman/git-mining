@@ -14,9 +14,8 @@
 
 * Intro
 
-Clone this repo: http://github.comd/dmgerman/git-mining
+This file is information that I wish I had known when I started doing heavy mining of git.
 
-Add this [[withCid.pl]] file to your path
 
 * Git log
 
