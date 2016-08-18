@@ -29,7 +29,7 @@ git  log  --help
 #+END_SRC
 
 #+RESULTS:
-#+begin_example
+#+BEGIN_EXAMPLE
 GIT-LOG(1)                        Git Manual                        GIT-LOG(1)
 
 NAME
@@ -1943,7 +1943,7 @@ GIT
        Part of the git(1) suite
 
 Git 2.7.4                         03/23/2016                        GIT-LOG(1)
-#+end_example
+#+END_EXAMPLE
 
 
 
