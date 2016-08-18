@@ -180,7 +180,7 @@ cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Author;Thomas E. Enebo <tom.enebo@gmail
 c5028dc54fa9a934273837758bf3040af1bb66a5;Author;Charles Oliver Nutter <headius@headius.com>
 #+end_example
 
-or you can learn how to do it via the format field
+or you can learn how to do it via the format option:
 
 #+BEGIN_SRC sh
 git -C /tmp/jruby log -6  --format='%H;%an'
