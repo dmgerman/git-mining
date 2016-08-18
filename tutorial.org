@@ -28,7 +28,6 @@ git  log  --help
 :
 #+END_SRC
 
-#+RESULTS:
 #+BEGIN_EXAMPLE
 GIT-LOG(1)                        Git Manual                        GIT-LOG(1)
 
@@ -1946,12 +1945,6 @@ Git 2.7.4                         03/23/2016                        GIT-LOG(1)
 #+END_EXAMPLE
 
 
-
-#+BEGIN_SRC sh  :output both
-exec 2>&1
-date -g 
-:
-#+END_SRC
 
 ** Default output
 
