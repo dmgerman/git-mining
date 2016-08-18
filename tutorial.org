@@ -688,7 +688,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de
 
 * How to track renames: use --follow
 
-Make sure you read git log and git blame regarding rename detection and how it works.
+Make sure you read the man pages of git log and git blame regarding rename detection and how it works.
 
 Using --numstat
 
