@@ -505,7 +505,7 @@ Date:   Sat Oct 24 21:35:11 2015 -0700
 Several issues:
 
 - it does not indicate if the file is added or removed
-- it does not output anything for binary files
+- it does not output numbers of added/deleted for binary files (only - -)
 - Time consuming:
   - A simple test: git log -100000 (log of 10k commits) of the linux kernel
   - --numstat and stat 66 seconds
