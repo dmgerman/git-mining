@@ -508,7 +508,7 @@ Several issues:
 - it does not output numbers of added/deleted for binary files (only - -)
 - Time consuming:
   - A simple test: git log -100000 (log of 10k commits) of the linux kernel
-  - --numstat and stat 66 seconds
+  - --numstat or --stat 66 seconds
   - --raw (see below): 10 seconds
 
 ** Better solution: --raw
