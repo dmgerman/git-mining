@@ -213,6 +213,9 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;Commiter;Charles Oliver Nutter; Commite
 
 * You can easily import info into a database
 
+warning. you have to be careful about using separators that might appear in the fields. Safer to use your own
+filter (see my example above)
+
 #+BEGIN_SRC sh
 git -C /tmp/jruby log  --format='%H;%an;%at;%cn;%ct' > /tmp/rip.rip
 #+END_SRC
