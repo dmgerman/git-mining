@@ -688,7 +688,9 @@ git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de
 
 * How to track renames: use --follow
 
-using --numstat
+Make sure you read git log and git blame regarding rename detection and how it works.
+
+Using --numstat
 
 #+BEGIN_SRC sh
 git  -C /tmp/jruby log --oneline --no-abbrev --numstat --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep '=>' -B 1
@@ -852,6 +854,10 @@ It should *not be used* for code intended for further distribution.
   - ASCII 0
   - Contents
 
+*** Example 
+
+Compute the blob of the current version of the file README.org and compare it against the lastest commit on that file
+
 #+BEGIN_SRC perl :results output
 use Digest::SHA qw(sha1_hex);
 
@@ -866,9 +872,8 @@ close IN;
 
 
 $len = length($contents);
-print sha1_hex("blob $len\0$contents");
+print sha1_hex("blob $len\0" . $contents);
 #+END_SRC
-
 
 #+begin_example
 7f2fe5eed121663f434adbea6d292e35471330f5
