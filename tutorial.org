@@ -662,7 +662,14 @@ a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    9)  *  MERCHANTABILITY or FI
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000   10)  *  General Public License for more details.
 #+end_example
 
-It is dangerous to use:
+the format is not very nice
+
+| time     | unix time in epoch                                               |
+| summary  | one liner of commit log                                          |
+| filename | if file was renamed, it tells you what the original filename was |
+| \tab     | actual content is preceeded by tab                               |
+
+It is also dangerous to use:
 
 - The authors are mapped using the file .mailmap found in the root directory of the project
 
@@ -698,7 +705,7 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;author;Charles Oliver Nutter;mailmapAut
 #+end_example
 
 
-Another alternative: simply map cid to metadata
+Another alternative: use porcelain (you also get the previous commit id for every line)
 
 #+BEGIN_SRC sh
 git -C /tmp/xournal blame --no-abbrev src/xo-file.c --line-porcelain | head -26
@@ -735,14 +742,12 @@ filename src/xo-file.c
 #+end_example
 
 
-Some comments about the fields:
-
-| time     | unix time in epoch                                               |
-| summary  | one liner of commit log                                          |
-| filename | if file was renamed, it tells you what the original filename was |
-| \tab     | actual content is preceeded by tab                               |
-
 * Many commands have porcelain output
 
 - They make your processing easier
+
+* Final comments
+
+- Read the man pages
+- You can simplify your life by asking for the right info 
 
