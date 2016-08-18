@@ -559,7 +559,7 @@ Date:   Tue Apr 5 14:51:54 2016 -0700
 | File mode after  |                                          |
 | blob before      |                                          |
 | blob after       |                                          |
-| operation        | M modified, D deleted, R rename, A added (rename only when using git mv) |
+| operation        | M modified, D deleted, R rename, A added  |
 | filename         |                                          |
 
 For merges, it contains n+1 info:
@@ -613,13 +613,13 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;M;spec/ruby/core/module/module_function
 
 ** Example of rename
 
-this file was renamed more than once, but never using git mv. it was done using git add, git rm
+this file was renamed more than once. 
 
 #+BEGIN_EXAMPLE
 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
 #+END_EXAMPLE
 
-Her is an example of how this rename is reported by different runs of git log on the commit that did the rename
+Her is an example of how this rename is reported by different runs of git log on one of the commits that did the rename
 
 Using --stat
 
