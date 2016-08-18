@@ -216,7 +216,9 @@ filter (see my example above). that way  you can make sure the separator is neve
 
 #+BEGIN_SRC sh
 git -C /tmp/jruby log  --format='%H<SEMI>%an<SEMI>%ae<SEMI>%at<SEMI>%cn<SEMI>%ce<SEMI>%ct<SEMI>%s' > /tmp/rip.rip
+# replace semicolons with a marker so we can import it
 perl -pe 's/;/<SEMICOLO>/g;' /tmp/rip.rip > /tmp/rip.rip2
+# replace <SEMI> with the ; delimiter (I like ;)
 perl -pe 's/<SEMI>/;/g' /tmp/rip.rip2 > /tmp/rip.rip3
 #+END_SRC
 
@@ -445,7 +447,7 @@ bcdd3a0382ffaa7fb9e117500403a6360b2ef5b2;1aaa40619a8afc55fdd4d6fe4f883aa0cf237bd
 #+end_example
 
 
-* Files modified: do not use numstat
+* Files modified: do not use --numstat, and never _ever_ think of using --stat
 
 - There are several ways to get the files modified in a commit
 
@@ -502,8 +504,11 @@ Date:   Sat Oct 24 21:35:11 2015 -0700
 Several issues:
 
 - it does not indicate if the file is added or removed
-
-
+- it does not output anything for binary files
+- Time consuming:
+  - A simple text: 100k commits
+  - --numstat takes 66 seconds
+  - --raw (see below): 10 seconds
 
 ** Better solution: --raw
 
@@ -563,24 +568,49 @@ For merges, it contains n+1 info:
 
 but only when the merge included a patch
 
+** --name-status
+
+- Easier to parse
+- but it does not track renames (files appear deleted and added)
+
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --no-abbrev --raw --merges --glob='*' | head
+git  -C /tmp/jruby log --oneline --no-abbrev --name-status -5
 #+END_SRC
 
+#+begin_example
+45e17306aa870f25094ebc4956e1b03ba12b24e7 Merge pull request #4078 from etehtsea/bump-racc
+0f717cf68d04824bfd5d1c66bcc40012176b15d1 Merge pull request #4085 from etehtsea/rm-lib-gitignore
+9b4164f7c73247c1fd3c5e2e817d2d58bc56c444 Remove lib/.gitignore
+M	.gitignore
+D	lib/.gitignore
+cc1743cb60f9c3898a778f877ab3f4c46666e0ff Fixes #3778. Unicode chars in method names aren't accepted
+M	core/src/main/java/org/jruby/ext/ripper/RipperLexer.java
+M	core/src/main/java/org/jruby/lexer/yacc/RubyLexer.java
+30594f467c2fe9165f263dd38796de5296c5576e Define module_function singleton method as proper clone.
+M	core/src/main/java/org/jruby/runtime/Helpers.java
+#+end_example
 
+You can now easily preprocess the data to load it into our database
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --name-status -10 | perl withCid.pl  | egrep $';.\t'  | perl -pe 's/\t/;/'
+#+END_SRC
 
 #+begin_example
-commit 45e17306aa870f25094ebc4956e1b03ba12b24e7
-Merge: 0f717cf68d04824bfd5d1c66bcc40012176b15d1 92aa13a6245ee7e1ab94011191bc5bb594a1fd04
-Author: Charles Oliver Nutter <headius@headius.com>
-Date:   Wed Aug 17 16:13:05 2016 -0500
-
-    Merge pull request #4078 from etehtsea/bump-racc
-    
-    Bump racc. Fixes #4071
-
-commit 0f717cf68d04824bfd5d1c66bcc40012176b15d1
+9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;M;.gitignore
+9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;D;lib/.gitignore
+cc1743cb60f9c3898a778f877ab3f4c46666e0ff;M;core/src/main/java/org/jruby/ext/ripper/RipperLexer.java
+cc1743cb60f9c3898a778f877ab3f4c46666e0ff;M;core/src/main/java/org/jruby/lexer/yacc/RubyLexer.java
+30594f467c2fe9165f263dd38796de5296c5576e;M;core/src/main/java/org/jruby/runtime/Helpers.java
+c5028dc54fa9a934273837758bf3040af1bb66a5;M;spec/ruby/core/module/module_function_spec.rb
+2d5e038c692ec8b913c8b21197bad9b9f0d73772;M;lib/pom.rb
+2d5e038c692ec8b913c8b21197bad9b9f0d73772;M;lib/pom.xml
+150c83d5cdd1b39b2802d74ff0b692db3f95fbc5;M;core/src/main/java/org/jruby/RubyArray.java
+45ed5f5af5b47e4039341275b538ac4015b71778;M;pom.rb
+45ed5f5af5b47e4039341275b538ac4015b71778;M;pom.xml
 #+end_example
+
+
 
 * Extracting versions of files
 
