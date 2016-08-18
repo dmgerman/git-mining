@@ -211,6 +211,40 @@ cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Commiter;Thomas E. Enebo; CommiterDate;
 c5028dc54fa9a934273837758bf3040af1bb66a5;Commiter;Charles Oliver Nutter; CommiterDate;1471387712
 #+end_example
 
+* You can easily import info into a database
+
+#+BEGIN_SRC sh
+git -C /tmp/jruby log  --format='%H;%an;%at;%cn;%ct' > /tmp/rip.rip
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sqlite :db /tmp/mydb.sql
+drop table if exists commits;
+create table commits(cid varchar, author varchar, authortime int, committer varchar, commitdate int);
+.mode csv commits
+.separator ;
+.import "/tmp/rip.rip" commits
+select count(*) from commits;
+#+END_SRC
+
+| count(*) |
+|----------|
+|    39924 |
+
+
+#+BEGIN_SRC sqlite :db /tmp/mydb.sql
+select author, count(*) from commits group by author order by count(*) desc limit 5;
+#+END_SRC
+
+| author                | count(*) |
+|-----------------------+----------|
+| Charles Oliver Nutter |     9668 |
+| Chris Seaton          |     5895 |
+| Thomas E. Enebo       |     3204 |
+| Benoit Daloze         |     2947 |
+| Kevin Menard          |     1684 |
+
 
 * Branches
 
