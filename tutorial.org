@@ -185,14 +185,13 @@ or you can learn how to do it via the format option:
 git -C /tmp/jruby log -6  --format='%H;%an'
 #+END_SRC
 
-
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Charles Oliver Nutter
-0f717cf68d04824bfd5d1c66bcc40012176b15d1;Charles Oliver Nutter
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;Konstantin Shabanov
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Thomas E. Enebo
-30594f467c2fe9165f263dd38796de5296c5576e;Charles Oliver Nutter
-c5028dc54fa9a934273837758bf3040af1bb66a5;Charles Oliver Nutter
+45e17306aa870f25094ebc4956e1b03ba12b24e7;Charles Oliver Nutter;Merge pull request #4078 from etehtsea/bump-racc
+0f717cf68d04824bfd5d1c66bcc40012176b15d1;Charles Oliver Nutter;Merge pull request #4085 from etehtsea/rm-lib-gitignore
+9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;Konstantin Shabanov;Remove lib/.gitignore
+cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Thomas E. Enebo;Fixes #3778. Unicode chars in method names aren't accepted
+30594f467c2fe9165f263dd38796de5296c5576e;Charles Oliver Nutter;Define module_function singleton method as proper clone.
+c5028dc54fa9a934273837758bf3040af1bb66a5;Charles Oliver Nutter;Spec for module_function's singleton method with super.
 #+end_example
 
 
@@ -212,40 +211,57 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;Commiter;Charles Oliver Nutter; Commite
 
 * You can easily import info into a database
 
-warning. you have to be careful about using separators that might appear in the fields. Safer to use your own
-filter (see my example above)
+warning. you have to be careful about using separators that might appear in the fields. It is safer to use your own
+filter (see my example above). that way  you can make sure the separator is never part of a field.
 
 #+BEGIN_SRC sh
-git -C /tmp/jruby log  --format='%H;%an;%at;%cn;%ct' > /tmp/rip.rip
+git -C /tmp/jruby log  --format='%H<SEMI>%an<SEMI>%ae<SEMI>%at<SEMI>%cn<SEMI>%ce<SEMI>%ct<SEMI>%s' > /tmp/rip.rip
+perl -pe 's/;/<SEMICOLO>/g;' /tmp/rip.rip > /tmp/rip.rip2
+perl -pe 's/<SEMI>/;/g' /tmp/rip.rip2 > /tmp/rip.rip3
 #+END_SRC
 
 #+RESULTS:
 
 #+BEGIN_SRC sqlite :db /tmp/mydb.sql
 drop table if exists commits;
-create table commits(cid varchar, author varchar, authortime int, committer varchar, commitdate int);
+create table commits(cid varchar, author varchar, authoremail varchar, authortime int, 
+                     committer varchar, commiteremail varchar, commitdate int, summary varchar);
 .mode csv commits
 .separator ;
-.import "/tmp/rip.rip" commits
+.import "/tmp/rip.rip3" commits
 select count(*) from commits;
 #+END_SRC
 
 | count(*) |
 |----------|
-|    39924 |
+|    38575 |
+
 
 
 #+BEGIN_SRC sqlite :db /tmp/mydb.sql
-select author, count(*) from commits group by author order by count(*) desc limit 5;
+select author, authoremail, count(*) from commits group by author, authoremail order by count(*) desc limit 6;
 #+END_SRC
 
-| author                | count(*) |
-|-----------------------+----------|
-| Charles Oliver Nutter |     9668 |
-| Chris Seaton          |     5895 |
-| Thomas E. Enebo       |     3204 |
-| Benoit Daloze         |     2947 |
-| Kevin Menard          |     1684 |
+| author                | authoremail             | count(*) |
+|-----------------------+-------------------------+----------|
+| Charles Oliver Nutter | headius@headius.com     |     9390 |
+| Chris Seaton          | chris@chrisseaton.com   |     3687 |
+| Thomas E. Enebo       | tom.enebo@gmail.com     |     3042 |
+| Benoit Daloze         | eregontp@gmail.com      |     2928 |
+| Chris Seaton          | chris.seaton@oracle.com |     2166 |
+| kares                 | self@kares.org          |     1503 |
+
+
+#+BEGIN_SRC sqlite :db /tmp/mydb.sql
+select cid, summary from commits limit 4;
+#+END_SRC
+
+| cid                                      | summary                                                    |
+|------------------------------------------+------------------------------------------------------------|
+| 45e17306aa870f25094ebc4956e1b03ba12b24e7 | Merge pull request #4078 from etehtsea/bump-racc           |
+| 0f717cf68d04824bfd5d1c66bcc40012176b15d1 | Merge pull request #4085 from etehtsea/rm-lib-gitignore    |
+| 9b4164f7c73247c1fd3c5e2e817d2d58bc56c444 | Remove lib/.gitignore                                      |
+| cc1743cb60f9c3898a778f877ab3f4c46666e0ff | Fixes #3778. Unicode chars in method names aren't accepted |
 
 
 * Branches
