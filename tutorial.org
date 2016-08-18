@@ -742,7 +742,7 @@ Some comments about the fields:
 | filename | if file was renamed, it tells you what the original filename was |
 | \tab     | actual content is preceeded by tab                               |
 
-* Many comments have porcelain output
+* Many commands have porcelain output
 
 - They make your processing easier
 
