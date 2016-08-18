@@ -691,28 +691,91 @@ git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de
 using --numstat
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --numstat --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep '=>'
+git  -C /tmp/jruby log --oneline --no-abbrev --numstat --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep '=>' -B 1
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
 0	0	truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java => TrufflePosixHandler.java}
+--
+4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb [Truffle] .posix package.
 1	1	truffle/src/main/java/org/jruby/truffle/platform/{ => posix}/TrufflePOSIXHandler.java
+--
+587a1a6a2c739d89bd600c1ea00be5597a24e4e8 [Truffle] Move a bunch of stuff out of runtime.
 1	1	truffle/src/main/java/org/jruby/truffle/{runtime/subsystems => platform}/TrufflePOSIXHandler.java
 #+end_example
+
 
 using --raw (way easier to parse)
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --raw --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep 'R[0-9]*'$'\t'
+git  -C /tmp/jruby log --oneline --no-abbrev --raw --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep 'R[0-9]*'$'\t' -B 1
 #+END_SRC
 
 #+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
 :100644 100644 3b785cd8bfee363b17097a118673bc6d9d14185f 3b785cd8bfee363b17097a118673bc6d9d14185f R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+--
+4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb [Truffle] .posix package.
 :100644 100644 ab689cf579d1c58da2eed0d9e6ffc4668d421933 acb5afa1cd637aad029c3eeee000995e6f0e03e2 R098	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+--
+587a1a6a2c739d89bd600c1ea00be5597a24e4e8 [Truffle] Move a bunch of stuff out of runtime.
 :100644 100644 d6467a8cb455990190ba732e04dabd710de023f0 3ecee7df1866cc4582b40d8425bc3cbc87274b6b R098	truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
 #+end_example
 
 
+Using --name-status
+
+- Easier to parse
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --name-status --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep '^R' -B 1
+#+END_SRC
+
+#+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+--
+4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb [Truffle] .posix package.
+R098	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+--
+587a1a6a2c739d89bd600c1ea00be5597a24e4e8 [Truffle] Move a bunch of stuff out of runtime.
+R098	truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+#+end_example
+
+Using --name-only
+- this will give you the file after the commit
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --format='%H%%' --name-only --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep -v '^$' | perl -pe 's/%\n/;/;'
+#+END_SRC
+
+#+begin_example
+9c4d56599e1eeed93669529922058be0285e6cca;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+c3fb92da93b482b09952e5e949c68c933a82e6f7;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+0e2c04cc75f067fffaade09cc55acb7c198e5615;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+b3046e5cb1ecc88a2160b71b45f606d3be39873b;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+745fcccc684131c16159523c277de01737d764f0;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+7f591b655c0ff8893d28bebc9a5e67845736dafc;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+e2de84746d9c710ee08d215dbad1bb4c7cf06227;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+f4d6315eec130b82a003eabab0cff501452af595;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+a15701111fcce340fd1e51f85c6783c33d9be896;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+30d975e6abdb1bdab1b80b0bfbd83313f139f8a2;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+29c937f3919d11ae3b054d128a929e4d9c09a2ce;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+587a1a6a2c739d89bd600c1ea00be5597a24e4e8;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+85e3ab5c7d27aaecc2d5299aef9d5ec8c80ce807;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+b59bdd5da37797c4d9c49c6500f40e697605752e;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+0765614df5efdd96da75d046c16321ce8bb0be29;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+87e8ba49649f42e7f152e522cc32030a7cb74743;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+d9ab72f4483abf7c61b12fd6515186806987f527;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+3d9f6f15d9176193482726dc63b681c11c175aff;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+9c22b944910b18607add8d7d1cb13653a3913a9a;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+5a97a52593071c9fe0e13a3660f59ebd5c4d968e;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+329a0ddc9b0253850336d2a7c0c7e4036fa762b9;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+6d50e0430e71539faba437412f9ebd8eec211497;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+#+end_example
 
 
 * Extracting versions of files
