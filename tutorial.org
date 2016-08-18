@@ -748,7 +748,7 @@ R098	truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHand
 #+end_example
 
 Using --name-only
-- this will give you the file after the commit
+- this will give you the file name after each commit to it.
 
 #+BEGIN_SRC sh
 git  -C /tmp/jruby log --oneline --no-abbrev --format='%H%%' --name-only --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep -v '^$' | perl -pe 's/%\n/;/;'
