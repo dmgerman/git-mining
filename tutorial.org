@@ -506,8 +506,8 @@ Several issues:
 - it does not indicate if the file is added or removed
 - it does not output anything for binary files
 - Time consuming:
-  - A simple text: 100k commits
-  - --numstat takes 66 seconds
+  - A simple test: git log -100000 (log of 10k commits) of the linux kernel
+  - --numstat and stat 66 seconds
   - --raw (see below): 10 seconds
 
 ** Better solution: --raw
