@@ -1947,7 +1947,7 @@ Git 2.7.4                         03/23/2016                        GIT-LOG(1)
 
 
 
-#+BEGIN_SRC sh 
+#+BEGIN_SRC sh  :output both
 exec 2>&1
 date -g 
 :
