@@ -669,7 +669,6 @@ git  -C /tmp/jruby log --oneline --no-abbrev --stat 745fcccc684131c16159523c277d
 git  -C /tmp/jruby log --oneline --no-abbrev --summary 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
-#+RESULTS:
 #+begin_example
 745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
  delete mode 100644 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
