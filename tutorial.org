@@ -707,7 +707,8 @@ git  -C /tmp/jruby log --oneline --no-abbrev --numstat --follow truffle/src/main
 #+end_example
 
 
-using --raw (way easier to parse)
+using --raw
+- easier to parse
 
 #+BEGIN_SRC sh
 git  -C /tmp/jruby log --oneline --no-abbrev --raw --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep 'R[0-9]*'$'\t' -B 1
