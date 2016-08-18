@@ -533,7 +533,9 @@ commit 0f717cf68d04824bfd5d1c66bcc40012176b15d1
 * Extracting versions of files
 
 - Git stores the actual contents of the files: the blobs
+- *do not extract using git checkout*. it is very slow
 - The --raw gives you the blob of a given file
+
 
 #+BEGIN_SRC sh
 git  -C /tmp/xournal log -1 --no-abbrev --raw 
