@@ -217,7 +217,7 @@ filter (see my example above). that way  you can make sure the separator is neve
 #+BEGIN_SRC sh
 git -C /tmp/jruby log  --format='%H<SEMI>%an<SEMI>%ae<SEMI>%at<SEMI>%cn<SEMI>%ce<SEMI>%ct<SEMI>%s' > /tmp/rip.rip
 # replace semicolons with a marker so we can import it
-perl -pe 's/;/<SEMICOLO>/g;' /tmp/rip.rip > /tmp/rip.rip2
+perl -pe 's/;/<SEMICOLON>/g;' /tmp/rip.rip > /tmp/rip.rip2
 # replace <SEMI> with the ; delimiter (I like ;)
 perl -pe 's/<SEMI>/;/g' /tmp/rip.rip2 > /tmp/rip.rip3
 #+END_SRC
