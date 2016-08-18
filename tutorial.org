@@ -558,7 +558,7 @@ Date:   Tue Apr 5 14:51:54 2016 -0700
 | File mode after  |                                          |
 | blob before      |                                          |
 | blob after       |                                          |
-| operation        | M modified, D deleted, R rename, A added |
+| operation        | M modified, D deleted, R rename, A added (rename only when using git mv) |
 | filename         |                                          |
 
 For merges, it contains n+1 info:
@@ -610,6 +610,99 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;M;spec/ruby/core/module/module_function
 45ed5f5af5b47e4039341275b538ac4015b71778;M;pom.xml
 #+end_example
 
+** Example of rename
+
+this file was renamed:
+
+--numstat
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --numstat 745fcccc684131c16159523c277de01737d764f0 -1
+#+END_SRC
+
+#+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+0	90	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+90	0	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+#+end_example
+
+--name-status
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --name-status 745fcccc684131c16159523c277de01737d764f0 -1
+#+END_SRC
+
+#+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+D	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+A	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+#+end_example
+
+--raw
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de01737d764f0 -1
+#+END_SRC
+
+#+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+:100644 000000 3b785cd8bfee363b17097a118673bc6d9d14185f 0000000000000000000000000000000000000000 D	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+:000000 100644 0000000000000000000000000000000000000000 3b785cd8bfee363b17097a118673bc6d9d14185f A	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+#+end_example
+
+--stat
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --stat 745fcccc684131c16159523c277de01737d764f0 -1
+#+END_SRC
+
+#+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+ .../platform/posix/TrufflePOSIXHandler.java        | 90 ----------------------
+ .../platform/posix/TrufflePosixHandler.java        | 90 ++++++++++++++++++++++
+ 2 files changed, 90 insertions(+), 90 deletions(-)
+#+end_example
+
+--summary
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --summary 745fcccc684131c16159523c277de01737d764f0 -1
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+ delete mode 100644 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+ create mode 100644 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+#+end_example
+
+* How to track renames: use --follow
+
+using --numstat
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --numstat --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep '=>'
+#+END_SRC
+
+#+begin_example
+0	0	truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java => TrufflePosixHandler.java}
+1	1	truffle/src/main/java/org/jruby/truffle/platform/{ => posix}/TrufflePOSIXHandler.java
+1	1	truffle/src/main/java/org/jruby/truffle/{runtime/subsystems => platform}/TrufflePOSIXHandler.java
+#+end_example
+
+using --raw (way easier to parse)
+
+#+BEGIN_SRC sh
+git  -C /tmp/jruby log --oneline --no-abbrev --raw --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep 'R[0-9]*'$'\t'
+#+END_SRC
+
+#+begin_example
+:100644 100644 3b785cd8bfee363b17097a118673bc6d9d14185f 3b785cd8bfee363b17097a118673bc6d9d14185f R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+:100644 100644 ab689cf579d1c58da2eed0d9e6ffc4668d421933 acb5afa1cd637aad029c3eeee000995e6f0e03e2 R098	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+:100644 100644 d6467a8cb455990190ba732e04dabd710de023f0 3ecee7df1866cc4582b40d8425bc3cbc87274b6b R098	truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+#+end_example
+
+
 
 
 * Extracting versions of files
@@ -617,7 +710,7 @@ c5028dc54fa9a934273837758bf3040af1bb66a5;M;spec/ruby/core/module/module_function
 - Git stores the actual contents of the files: the blobs
 - *do not extract using git checkout*. it is very slow
 - The --raw gives you the blob of a given file
-
+- You need to use the filename at the time of the commit (in case it was later renamed)
 
 #+BEGIN_SRC sh
 git  -C /tmp/xournal log -1 --no-abbrev --raw 
