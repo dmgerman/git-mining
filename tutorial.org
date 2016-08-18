@@ -394,7 +394,7 @@ The DAG is the fundamental data structure of git
 
 - Every commit has zero or more parents
 - Merges have two or more parents (I have seen 16 parents in one commit)
-- Current heads of branches (including master) have zero children
+- Current heads of branches (including master) might have zero children (at least on branch will always have zero children)
 - Roots of the branches have zero parents 
 
 #+BEGIN_SRC sh
