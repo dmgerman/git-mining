@@ -3,25 +3,114 @@
 #+TAGS:
 #+SEQ_TODO: TODO STARTED DONE DEFERRED CANCELLED | WAITING DELEGATED APPT
 #+DRAWERS: HIDDEN STATE
-#+TITLE: Git/Github mininig tutorial
+#+TITLE: Git mininig tutorial: part 1 --- the basics
 #+CATEGORY: 
 #+PROPERTY: header-args: lang           :varname value
 #+PROPERTY: header-args:sqlite          :db /path/to/db  :colnames yes
 #+PROPERTY: header-args:R               :results output
-#+PROPERTY: header-args:sh              :results output
-
-
+#+PROPERTY: header-args:sh              :results output :exports both
+#+OPTIONS: ^:nil
 
 * Intro
 
 This file is information that I wish I had known when I started doing heavy mining of git.
 
+* The DAG
+
+- git records commits
+
+- commits create a DAG
+  - Each commit has one or more parents (ordered)
+  - A commit with more than one parent is a merge-commit
+  
+- Most frequently the DAG is a tree 
+  - one root commit
+  
+- But some projects have many roots
+  - This is a *feature* of git: you can merge repos!!!
+
+* Commits
+
+- Commits record the state of the file system after each commit
+  - What files/directories (and their attributes) exist
+   - and what their contents are
+- And metadata associated with it:
+  - Who/when committed to the current repo (its committer)
+  - Who/when created the commit (its author)
+  
+- git does not store diffs!
+  - which means diffs are expensive to compute
+
+
+* Non-merge commits
+
+- Non-merge commits *always* have one single parent
+
+* Merge commits
+
+- Merge commits have multiple parents. 
+
+- Merges with more than 2 parents are called /octupus/ merge
+  - From Linus, regarding an octupus merge in the Kernel (Jan 2014).
+
+  #+BEGIN_EXAMPLE
+Christ. When you start doing octopus merges, you don't do it by half
+measures, do you?
+
+I just pulled the sound updates from Takashi, and as a result got your
+merge commit 2cde51fbd0f3. That one has 66 parents.
+
+That kind of merge either needs to be split up, or gitk needs to be
+made better about visualizing it, because it ends up being *so* wide
+that the history is hard to read.
+  #+END_EXAMPLE
+
+
+* Cloning
+
+
+#+BEGIN_SRC sh
+cd /tmp
+git clone https://github.com/git/git repo
+#+END_SRC
+
+- Cloning retrieves all commits in the repo
+- And their tags
+
+* Branches
+
+If you also want a clean list of branches and their corresponding heads:
+
+#+BEGIN_SRC sh
+git -C /tmp/repo fetch --all
+#+END_SRC
+
+
+This creates a file called .git/FETCH_HEAD. It contains
+
+- commit id
+- branch name
+- location
+
+#+BEGIN_SRC sh :output both
+head /tmp/repo/.git/FETCH_HEAD 
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7		branch 'master' of https://github.com/git/git
+3b9e3c2cede15057af3ff8076c45ad5f33829436	not-for-merge	branch 'maint' of https://github.com/git/git
+67fe103aa68d54c3706f4a9cdf52c50f21979829	not-for-merge	branch 'next' of https://github.com/git/git
+512253265c9c9d014d29165f4c421e6304266292	not-for-merge	branch 'pu' of https://github.com/git/git
+22216bdf6ae7a2709b577b361e5d58dc97270f38	not-for-merge	branch 'todo' of https://github.com/git/git
+#+end_example
 
 * Git log
 
-Git log has many, many different options
+- This is the workhorse of mining git
+- You can extract *almost* everything with it
 
-#+BEGIN_SRC sh :output both
+#+BEGIN_SRC sh :output results
 exec 2>&1
 git  log  --help  | head -20
 :
@@ -50,69 +139,68 @@ OPTIONS
 
 #+end_example
 
-
-
-
 ** Default output
 
-#+BEGIN_SRC sh 
-git -C  /tmp/jruby log -1 | head
+#+BEGIN_SRC sh :output both
+git -C  /tmp/repo log -2
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-commit 45e17306aa870f25094ebc4956e1b03ba12b24e7
-Merge: 0f717cf 92aa13a
-Author: Charles Oliver Nutter <headius@headius.com>
-Date:   Wed Aug 17 16:13:05 2016 -0500
+commit e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7
+Author: Junio C Hamano <gitster@pobox.com>
+Date:   Fri Feb 24 10:49:58 2017 -0800
 
-    Merge pull request #4078 from etehtsea/bump-racc
+    Git 2.12
     
-    Bump racc. Fixes #4071
+    Signed-off-by: Junio C Hamano <gitster@pobox.com>
+
+commit cca4f20edad04decdc268102f9a6ee2e3803bcc7
+Merge: dc9ded4 7e82388
+Author: Junio C Hamano <gitster@pobox.com>
+Date:   Fri Feb 24 10:48:10 2017 -0800
+
+    Merge branch 'ps/doc-gc-aggressive-depth-update'
+    
+    Doc update.
+    
+    * ps/doc-gc-aggressive-depth-update:
+      docs/git-gc: fix default value for `--aggressiveDepth`
+#+end_example
+
+** Some important git log options: oneline
+
+| --oneline    | one commit per line. 
+
+#+BEGIN_SRC sh :output both
+git -C  /tmp/repo log --oneline -5
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+e7e07d5 Git 2.12
+cca4f20 Merge branch 'ps/doc-gc-aggressive-depth-update'
+dc9ded4 Merge branch 'bc/worktree-doc-fix-detached'
+c6788b1 Merge branch 'dr/doc-check-ref-format-normalize'
+eccf97c Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'
 #+end_example
 
 
+** Some important git log options: no-abbrev
 
+| --no-abbbrev | Force git to always give you full commit ids |
 
-** Some important git log options
-
-| --no-abbbrev |
-
-#+BEGIN_SRC sh 
-git -C  /tmp/jruby log -1 --no-abbrev| head
+#+BEGIN_SRC sh :output both
+git -C  /tmp/repo log -1 --oneline --no-abbrev -5
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-commit 45e17306aa870f25094ebc4956e1b03ba12b24e7
-Merge: 0f717cf68d04824bfd5d1c66bcc40012176b15d1 92aa13a6245ee7e1ab94011191bc5bb594a1fd04
-Author: Charles Oliver Nutter <headius@headius.com>
-Date:   Wed Aug 17 16:13:05 2016 -0500
-
-    Merge pull request #4078 from etehtsea/bump-racc
-    
-    Bump racc. Fixes #4071
-#+end_example
-
-
-| --oneline    |
-
-#+BEGIN_SRC sh
-git -C  /tmp/jruby log --oneline  | head
-#+END_SRC
-
-
-#+begin_example
-45e1730 Merge pull request #4078 from etehtsea/bump-racc
-0f717cf Merge pull request #4085 from etehtsea/rm-lib-gitignore
-9b4164f Remove lib/.gitignore
-cc1743c Fixes #3778. Unicode chars in method names aren't accepted
-30594f4 Define module_function singleton method as proper clone.
-c5028dc Spec for module_function's singleton method with super.
-2d5e038 Update to jruby-readline 1.1 snapshot. Fixes #3721
-150c83d Use the utility methods, so we can centralize all packed const.
-b433c55 Merge pull request #4079 from etehtsea/fix-mailing-lists-link
-45ed5f5 Fix link to mailing lists
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7 Git 2.12
+cca4f20edad04decdc268102f9a6ee2e3803bcc7 Merge branch 'ps/doc-gc-aggressive-depth-update'
+dc9ded480245c1014b526c4b951d1acb3a60d3fa Merge branch 'bc/worktree-doc-fix-detached'
+c6788b1f45c6da1139570430b998028e3d2af590 Merge branch 'dr/doc-check-ref-format-normalize'
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'
 #+end_example
 
 
@@ -120,11 +208,16 @@ b433c55 Merge pull request #4079 from etehtsea/fix-mailing-lists-link
 
 This program will:
 
-- Output the cid in front of any line
 - replace any semicolon in the input with <SEMICOLON>
-
+- every input line is converted to a "record": 
+  - separator ";"
+  - first field: commitid
+  - second field: name of header field, empty for body
+  - third field: contents of field
+- a line starting with "commit <cid> " or "<cid> " will be considered a new commit
+  
 #+name: withCid.pl
-#+BEGIN_SRC bash
+#+BEGIN_SRC perl :tangle withCid.pl
 #!/usr/bin/perl
 
 my $strict;
@@ -132,91 +225,165 @@ my $cid;
 while (<>) {
     chomp;
     s/;/<SEMICOLON>/g;
-    if (/^commit ([0-9a-f]{40}) *(.*)$/) {
-        $cid = $1;
+    
+    if (/^commit ([0-9a-f]{40}) *(.*)$/) { 
+        # match commit id
+        $cid = $1; 
         print "$1;$2\n";
-    } elsif  (/^([0-9a-f]{40}) *(.*)$/) {
-        $cid = $1;
+    } elsif (/^([0-9a-f]{40}) *(.*)$/) {
+        # --abbrev does not include commit
+        $cid = $1; 
         print "$1;$2\n";
     } else {
-        if (/^(\D+):\s+(.*)$/) {
-           $_ = "$1;$2";
+        if (/^(\S+):\s+(.*)$/) {
+           # if it has a non-space sequence followed by :
+           # then it is a header field. split
+            print "$cid;$1;$2\n";
+        } else {
+            print "$cid;;$_\n";
         }
-        print "$cid;$_\n";
     }
 }
 #+END_SRC
 
+#+RESULTS: withCid.pl
+
 #+BEGIN_SRC sh
-git -C /tmp/jruby log -1  | perl withCid.pl 
+git -C /tmp/repo log -2  | perl withCid.pl 
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7;
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Merge;0f717cf 92aa13a
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Author;Charles Oliver Nutter <headius@headius.com>
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Date;Wed Aug 17 16:13:05 2016 -0500
-45e17306aa870f25094ebc4956e1b03ba12b24e7;
-45e17306aa870f25094ebc4956e1b03ba12b24e7;    Merge pull request #4078 from etehtsea/bump-racc
-45e17306aa870f25094ebc4956e1b03ba12b24e7;    
-45e17306aa870f25094ebc4956e1b03ba12b24e7;    Bump racc. Fixes #4071
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Author;Junio C Hamano <gitster@pobox.com>
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Date;Fri Feb 24 10:49:58 2017 -0800
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    Git 2.12
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    Signed-off-by: Junio C Hamano <gitster@pobox.com>
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Merge;dc9ded4 7e82388
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Author;Junio C Hamano <gitster@pobox.com>
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Date;Fri Feb 24 10:48:10 2017 -0800
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    Merge branch 'ps/doc-gc-aggressive-depth-update'
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    Doc update.
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    * ps/doc-gc-aggressive-depth-update:
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;      docs/git-gc: fix default value for `--aggressiveDepth`
 #+end_example
+
 
 So now  we can extract any information we want:
 
 #+BEGIN_SRC sh
-git -C /tmp/jruby log -6  | perl withCid.pl | grep ';Author;' 
+git -C /tmp/repo log -6  | perl withCid.pl | grep ';Author;' 
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Author;Charles Oliver Nutter <headius@headius.com>
-0f717cf68d04824bfd5d1c66bcc40012176b15d1;Author;Charles Oliver Nutter <headius@headius.com>
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;Author;Konstantin Shabanov <mail@etehtsea.me>
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Author;Thomas E. Enebo <tom.enebo@gmail.com>
-30594f467c2fe9165f263dd38796de5296c5576e;Author;Charles Oliver Nutter <headius@headius.com>
-c5028dc54fa9a934273837758bf3040af1bb66a5;Author;Charles Oliver Nutter <headius@headius.com>
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Author;Junio C Hamano <gitster@pobox.com>
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Author;Junio C Hamano <gitster@pobox.com>
+dc9ded480245c1014b526c4b951d1acb3a60d3fa;Author;Junio C Hamano <gitster@pobox.com>
+c6788b1f45c6da1139570430b998028e3d2af590;Author;Junio C Hamano <gitster@pobox.com>
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Author;Junio C Hamano <gitster@pobox.com>
+c0588fd61aa6da96824eec60719c505b66239dd6;Author;Junio C Hamano <gitster@pobox.com>
 #+end_example
+
+* But git log is already capable of doing this: format
+
+#+BEGIN_SRC sh :output both
+man git-log  | egrep -A 20 'format:<string>$'
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+       ·   format:<string>
+
+           The format:<string> format allows you to specify which information
+           you want to show. It works a little bit like printf format, with
+           the notable exception that you get a newline with %n instead of \n.
+
+           E.g, format:"The author of %h was %an, %ar%nThe title was >>%s<<%n"
+           would show something like this:
+
+               The author of fe6e0ee was Junio C Hamano, 23 hours ago
+               The title was >>t4119: test autocomputing -p<n> for traditional diff input.<<
+
+           The placeholders are:
+
+           ·   %H: commit hash
+
+           ·   %h: abbreviated commit hash
+
+           ·   %T: tree hash
+
+           ·   %t: abbreviated tree hash
+#+end_example
+
+
+* git log format: most useful options
+
+
+| %H  | commit hash                                     |
+| %P  | parent hashes                                   |
+| %an | author name                                     |
+| %ae | author email                                    |
+| %ad | author date (format respects --date= option)    |
+| %aD | author date, RFC2822 style                      |
+| %cn | committer name                                  |
+| %ce | committer email                                 |
+| %cd | committer date (format respects --date= option) |
+| %cD | committer date, RFC2822 style                   |
+| %s  | subject                                         |
+| %f  | sanitized subject line, suitable for a filename |
+| %b  | body                                            |
+
+* git log format...
 
 or you can learn how to do it via the format option:
 
 #+BEGIN_SRC sh
-git -C /tmp/jruby log -6  --format='%H;%an'
+git -C /tmp/repo log -6  --format='%H;%an;%ae'
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Charles Oliver Nutter;Merge pull request #4078 from etehtsea/bump-racc
-0f717cf68d04824bfd5d1c66bcc40012176b15d1;Charles Oliver Nutter;Merge pull request #4085 from etehtsea/rm-lib-gitignore
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;Konstantin Shabanov;Remove lib/.gitignore
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Thomas E. Enebo;Fixes #3778. Unicode chars in method names aren't accepted
-30594f467c2fe9165f263dd38796de5296c5576e;Charles Oliver Nutter;Define module_function singleton method as proper clone.
-c5028dc54fa9a934273837758bf3040af1bb66a5;Charles Oliver Nutter;Spec for module_function's singleton method with super.
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Junio C Hamano;gitster@pobox.com
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Junio C Hamano;gitster@pobox.com
+dc9ded480245c1014b526c4b951d1acb3a60d3fa;Junio C Hamano;gitster@pobox.com
+c6788b1f45c6da1139570430b998028e3d2af590;Junio C Hamano;gitster@pobox.com
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Junio C Hamano;gitster@pobox.com
+c0588fd61aa6da96824eec60719c505b66239dd6;Junio C Hamano;gitster@pobox.com
 #+end_example
 
-
 #+BEGIN_SRC sh
-git -C /tmp/jruby log -6  --format='%H;Commiter;%cn; CommiterDate;%ct'
+git -C /tmp/repo log -6  --format='%H;Commiter;%cn; CommiterDate;%ct'
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7;Commiter;GitHub; CommiterDate;1471468385
-0f717cf68d04824bfd5d1c66bcc40012176b15d1;Commiter;GitHub; CommiterDate;1471467486
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;Commiter;Konstantin Shabanov; CommiterDate;1471449551
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;Commiter;Thomas E. Enebo; CommiterDate;1471447247
-30594f467c2fe9165f263dd38796de5296c5576e;Commiter;Charles Oliver Nutter; CommiterDate;1471387780
-c5028dc54fa9a934273837758bf3040af1bb66a5;Commiter;Charles Oliver Nutter; CommiterDate;1471387712
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Commiter;Junio C Hamano; CommiterDate;1487962198
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Commiter;Junio C Hamano; CommiterDate;1487962090
+dc9ded480245c1014b526c4b951d1acb3a60d3fa;Commiter;Junio C Hamano; CommiterDate;1487962090
+c6788b1f45c6da1139570430b998028e3d2af590;Commiter;Junio C Hamano; CommiterDate;1487962089
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Commiter;Junio C Hamano; CommiterDate;1487962089
+c0588fd61aa6da96824eec60719c505b66239dd6;Commiter;Junio C Hamano; CommiterDate;1487962088
 #+end_example
 
 * You can easily import info into a database
 
-warning. you have to be careful about using separators that might appear in the fields. It is safer to use your own
+*Warning*. you have to be careful about using separators that might appear in the fields. It is safer to use your own
 filter (see my example above). that way  you can make sure the separator is never part of a field. Or
 hack it as I have done it below. You could restore the semicolons once data is in the database.
 
+In this example I am going to import:
+ - cid, author, authoremail, authortime, committer, comitteremail, commitdate and summary
+
 #+BEGIN_SRC sh
-git -C /tmp/jruby log  --format='%H<SEMI>%an<SEMI>%ae<SEMI>%at<SEMI>%cn<SEMI>%ce<SEMI>%ct<SEMI>%s' > /tmp/rip.rip
+git -C /tmp/repo log  --format='%H<SEMI>%an<SEMI>%ae<SEMI>%at<SEMI>%cn<SEMI>%ce<SEMI>%ct<SEMI>%s' > /tmp/rip.rip
 # replace semicolons with a marker so we can import it
 perl -pe 's/;/<SEMICOLON>/g;' /tmp/rip.rip > /tmp/rip.rip2
 # replace <SEMI> with the ; delimiter (I like ;)
@@ -225,7 +392,7 @@ perl -pe 's/<SEMI>/;/g' /tmp/rip.rip2 > /tmp/rip.rip3
 
 #+RESULTS:
 
-#+BEGIN_SRC sqlite :db /tmp/mydb.sql
+#+BEGIN_SRC sqlite :db /tmp/mydb.sql :exports both
 drop table if exists commits;
 create table commits(cid varchar, author varchar, authoremail varchar, authortime int, 
                      committer varchar, commiteremail varchar, commitdate int, summary varchar);
@@ -235,167 +402,220 @@ create table commits(cid varchar, author varchar, authoremail varchar, authortim
 select count(*) from commits;
 #+END_SRC
 
+#+RESULTS:
 | count(*) |
 |----------|
-|    38575 |
-
-
+|    43937 |
 
 #+BEGIN_SRC sqlite :db /tmp/mydb.sql
-select author, authoremail, count(*) from commits group by author, authoremail order by count(*) desc limit 6;
+select * from commits limit 10;
 #+END_SRC
 
-| author                | authoremail             | count(*) |
-|-----------------------+-------------------------+----------|
-| Charles Oliver Nutter | headius@headius.com     |     9390 |
-| Chris Seaton          | chris@chrisseaton.com   |     3687 |
-| Thomas E. Enebo       | tom.enebo@gmail.com     |     3042 |
-| Benoit Daloze         | eregontp@gmail.com      |     2928 |
-| Chris Seaton          | chris.seaton@oracle.com |     2166 |
-| kares                 | self@kares.org          |     1503 |
+#+RESULTS:
+| cid                                      | author             | authoremail              | authortime | committer      | commiteremail            | commitdate | summary                                                          |
+|------------------------------------------+--------------------+--------------------------+------------+----------------+--------------------------+------------+------------------------------------------------------------------|
+| e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7 | Junio C Hamano     | gitster@pobox.com        | 1487962198 | Junio C Hamano | gitster@pobox.com        | 1487962198 | Git 2.12                                                         |
+| cca4f20edad04decdc268102f9a6ee2e3803bcc7 | Junio C Hamano     | gitster@pobox.com        | 1487962090 | Junio C Hamano | gitster@pobox.com        | 1487962090 | Merge branch 'ps/doc-gc-aggressive-depth-update'                 |
+| dc9ded480245c1014b526c4b951d1acb3a60d3fa | Junio C Hamano     | gitster@pobox.com        | 1487962090 | Junio C Hamano | gitster@pobox.com        | 1487962090 | Merge branch 'bc/worktree-doc-fix-detached'                      |
+| c6788b1f45c6da1139570430b998028e3d2af590 | Junio C Hamano     | gitster@pobox.com        | 1487962089 | Junio C Hamano | gitster@pobox.com        | 1487962089 | Merge branch 'dr/doc-check-ref-format-normalize'                 |
+| eccf97c386ea970cc1fa6e6387f4786d05ecd76e | Junio C Hamano     | gitster@pobox.com        | 1487962089 | Junio C Hamano | gitster@pobox.com        | 1487962089 | Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'  |
+| c0588fd61aa6da96824eec60719c505b66239dd6 | Junio C Hamano     | gitster@pobox.com        | 1487962088 | Junio C Hamano | gitster@pobox.com        | 1487962088 | Merge branch 'rt/align-add-i-help-text'                          |
+| af4027f2decece569e7a565e592ca69677c27996 | Junio C Hamano     | gitster@pobox.com        | 1487962087 | Junio C Hamano | gitster@pobox.com        | 1487962088 | Merge branch 'bc/blame-doc-fix'                                  |
+| 7e82388024504be733ba23c97f884148870fe9cc | Patrick Steinhardt | ps@pks.im                | 1487926005 | Junio C Hamano | gitster@pobox.com        | 1487959152 | docs/git-gc: fix default value for `--aggressiveDepth`           |
+| cc24d7d21f4fe034b9559dcfd669d9639b9d52a4 | Junio C Hamano     | gitster@pobox.com        | 1487958941 | Junio C Hamano | gitster@pobox.com        | 1487958941 | Merge tag 'l10n-2.12.0-rnd2' of git://github.com/git-l10n/git-po |
+| 1a79b2f1795a6ec4c70674ce930843aa59bff859 | Jiang Xin          | worldhello.net@gmail.com | 1485528657 | Jiang Xin      | worldhello.net@gmail.com | 1487953154 | l10n: zh_CN: for git v2.12.0 l10n round 2                        |
+
 
 
 #+BEGIN_SRC sqlite :db /tmp/mydb.sql
 select cid, summary from commits limit 4;
 #+END_SRC
 
-| cid                                      | summary                                                    |
-|------------------------------------------+------------------------------------------------------------|
-| 45e17306aa870f25094ebc4956e1b03ba12b24e7 | Merge pull request #4078 from etehtsea/bump-racc           |
-| 0f717cf68d04824bfd5d1c66bcc40012176b15d1 | Merge pull request #4085 from etehtsea/rm-lib-gitignore    |
-| 9b4164f7c73247c1fd3c5e2e817d2d58bc56c444 | Remove lib/.gitignore                                      |
-| cc1743cb60f9c3898a778f877ab3f4c46666e0ff | Fixes #3778. Unicode chars in method names aren't accepted |
+#+RESULTS:
+| cid                                      | summary                                          |
+|------------------------------------------+--------------------------------------------------|
+| e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7 | Git 2.12                                         |
+| cca4f20edad04decdc268102f9a6ee2e3803bcc7 | Merge branch 'ps/doc-gc-aggressive-depth-update' |
+| dc9ded480245c1014b526c4b951d1acb3a60d3fa | Merge branch 'bc/worktree-doc-fix-detached'      |
+| c6788b1f45c6da1139570430b998028e3d2af590 | Merge branch 'dr/doc-check-ref-format-normalize' |
 
 
 * Branches
 
-When cloning, by default, you only get one branch
+When cloning, you get all commits in the repo, but not all the branch info
 
 See [[http://github.com/dmgerman/xournal]]
 
 
-#+BEGIN_SRC 
+#+BEGIN_SRC  sh
 cd /tmp/
 git clone http://github.com/dmgerman/xournal 
 #+END_SRC
 
+#+RESULTS:
+
+
 #+BEGIN_SRC sh
-git -C /tmp/xournal branch
+git -C /tmp/xournal branch --all
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-* master
+\* master
+  remotes/origin/HEAD -> origin/master
+  remotes/origin/bookmarks
+  remotes/origin/cl-options
+  remotes/origin/cmake
+  remotes/origin/dmgwin
+  remotes/origin/dot-paper-style
+  remotes/origin/fix-update-width
+  remotes/origin/glade
+  remotes/origin/gtk3
+  remotes/origin/horizontal-scroll-lock
+  remotes/origin/layers
+  remotes/origin/master
+  remotes/origin/message
+  remotes/origin/mru
+  remotes/origin/next
+  remotes/origin/popupmenu
+  remotes/origin/quick-zoom
+  remotes/origin/redo
+  remotes/origin/snap-to-grid
+  remotes/origin/upstream
 #+end_example
 
-You must fetch everything
+Use fetch --all to create a nice file that has all this info
 
 #+BEGIN_SRC sh
 git -C /tmp/xournal fetch --all
 #+END_SRC
 
+
 Then you have a file: .git/FETCH_HEAD that contains all information of branches
 
 #+BEGIN_SRC sh
-cat /tmp/xournal/.git/FETCH_HEAD
+cat /tmp/xournal/.git/FETCH_HEAD  | head -5
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-03b7651644aea0a95fd09f1566d4a667df8d7950		branch 'master' of http://github.com/dmgerman/xournal
-aaa50b9cc7efadea40bc812cd3dfb08d446b79a2	not-for-merge	branch 'a5paper' of http://github.com/dmgerman/xournal
-b8e7c5036289fbe36d423c4db9ce7a63bd1c6f75	not-for-merge	branch 'ahmed' of http://github.com/dmgerman/xournal
+015aa5dfb1b612c208192cfb9692d1eb6b8fd297		branch 'master' of http://github.com/dmgerman/xournal
 b3f07476632ed5b742af3506cb7cd4272956d339	not-for-merge	branch 'bookmarks' of http://github.com/dmgerman/xournal
-dad5c6c5756e1d47fed8203b606907efab2b17fa	not-for-merge	branch 'cl-options' of http://github.com/dmgerman/xournal
-db66cd33599d4d838f4feef5980ba907911bc9e6	not-for-merge	branch 'cmake' of http://github.com/dmgerman/xournal
+ad1febce77ed17987dda1bca940fc3e555e6b503	not-for-merge	branch 'cl-options' of http://github.com/dmgerman/xournal
+59cb4a16aba5042b3b552c4a7f3187196b99d953	not-for-merge	branch 'cmake' of http://github.com/dmgerman/xournal
 3b3cb888333d165fe2dd05dfd10560f40ca7befa	not-for-merge	branch 'dmgwin' of http://github.com/dmgerman/xournal
-a4d7604766d71790a495acc67a74d8a3cb0de7d4	not-for-merge	branch 'dot-paper-style' of http://github.com/dmgerman/xournal
-02afa27473d7907aa64e066a0d6a1394f5f9414a	not-for-merge	branch 'fix-update-width' of http://github.com/dmgerman/xournal
-e50be735d47e41739b283298d05b86d2278f5742	not-for-merge	branch 'fix-windows-paths' of http://github.com/dmgerman/xournal
-2190827a1818ac313cc3700f8cc94ecec5a00359	not-for-merge	branch 'glade' of http://github.com/dmgerman/xournal
-953b0e1fe2f1b5c3e02aa90085144a45f4483f74	not-for-merge	branch 'gtk3' of http://github.com/dmgerman/xournal
-9d9e155886255687d9ca882a8e7df3031c450248	not-for-merge	branch 'horizontal-scroll-lock' of http://github.com/dmgerman/xournal
-ecd8b62f9c0268d43aeaba762e8f0f04619cae87	not-for-merge	branch 'layers' of http://github.com/dmgerman/xournal
-36bad42fc8d20b05647c29219828eacf6b2c1090	not-for-merge	branch 'message' of http://github.com/dmgerman/xournal
-69749f060959c32009c13f51f25f4cfdcdb3da8b	not-for-merge	branch 'mru' of http://github.com/dmgerman/xournal
-c08da1d700a818cada297aee949b40da780b536e	not-for-merge	branch 'next' of http://github.com/dmgerman/xournal
-7481181564eba893b82766a2c34fd785ff07158e	not-for-merge	branch 'popupmenu' of http://github.com/dmgerman/xournal
-f68880c6aef5d3f4b9e62d58e38bec2dbbe6a36b	not-for-merge	branch 'quick-zoom' of http://github.com/dmgerman/xournal
-a8b50c33e6ec0c63002b6b7feba05fe2ab433af9	not-for-merge	branch 'redo' of http://github.com/dmgerman/xournal
-ca3bc5b770ee0b1ada9447969f48ca25c7443d32	not-for-merge	branch 'snap-to-grid' of http://github.com/dmgerman/xournal
-af7c91dc621677ec03c65c11814418d36585c3c2	not-for-merge	branch 'touchscreen-as-hand-tool' of http://github.com/dmgerman/xournal
-f28489f7f7477e59a9015e17a795c88ab89d977d	not-for-merge	branch 'upstream' of http://github.com/dmgerman/xournal
 #+end_example
+
+
+* Commits in Branches
 
 By default, git log gives you the log of the "current" branch
 
-#+BEGIN_SRC sh
+- From the current commit backwards to the roots of the repo
+
+#+BEGIN_SRC sh :cmdline -v
+git -C /tmp/xournal checkout master
+git -C /tmp/xournal branch
 git -C /tmp/xournal log  -1
+git -C /tmp/xournal checkout remotes/origin/next
+git -C /tmp/xournal branch
+git -C /tmp/xournal log -1
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-commit 03b7651644aea0a95fd09f1566d4a667df8d7950
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:36 2016 +0200
+git -C /tmp/xournal checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
 
-    update readme.org
-#+end_example
+git -C /tmp/xournal branch
+*master
 
-but git log --glob='*' gives you _all_ commits
-
-
-#+BEGIN_SRC sh
-git -C /tmp/xournal log --glob='*' -2
-#+END_SRC
-
-
-#+begin_example
-commit c08da1d700a818cada297aee949b40da780b536e
-Merge: 661075a 03b7651
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:46 2016 +0200
-
-    Merge branch 'master' into next
-
-commit 03b7651644aea0a95fd09f1566d4a667df8d7950
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:36 2016 +0200
-
-    update readme.org
-#+end_example
-
-or a specific branch: use origin to indicate that it is the branch upstream
-
-#+BEGIN_SRC sh
-git -C /tmp/xournal log origin/mru -2
-#+END_SRC
-
-
-#+begin_example
-commit 69749f060959c32009c13f51f25f4cfdcdb3da8b
-Author: Daniel M German <dmg@uvic.ca>
-Date:   Tue Dec 9 20:57:42 2014 -0800
-
-    Support for page numbers in Most recently used files.
-    
-    - The current page is saved in the .xoj file
-    - Under Linux, it is also saved in the gvfs metadata. Precendece is file current page, then gvfs metadata.
-
-commit f28489f7f7477e59a9015e17a795c88ab89d977d
+git -C /tmp/xournal log  -1
+commit 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
 Author: Denis Auroux <auroux@users.sourceforge.net>
-Date:   Tue Apr 5 14:51:54 2016 -0700
+Date:   Wed Aug 17 10:03:35 2016 -0700
 
-    text and image tools activate on button release instead of button press, to avoid subsequent confusion between clicks in toolbar and drawing area
+    Add .gitignore
+git -C /tmp/xournal checkout remotes/origin/next
+Note: checking out 'remotes/origin/next'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b <new-branch-name>
+
+HEAD is now at 031f268... merged kinetic scroll by Immi
+git -C /tmp/xournal branch
+*(HEAD detached at origin/next)
+  master
+git -C /tmp/xournal log  -1
+commit 031f268cf4ee67bb2e26bfe0a842fa48352b6d24
+Merge: b8712f4 ef22a43
+Author: D German <dmg@uvic.ca>
+Date:   Sun Sep 11 22:16:02 2016 -0700
+
+    merged kinetic scroll by Immi
 #+end_example
+
+* Commits in Branches...
+
+if you want all commits, then use glob='*'
+
+- includes all branches
+  - even "detached branches" 
+- irrespective to current commit
+
+#+BEGIN_SRC sh :cmdline -v :exports both
+git -C /tmp/xournal checkout master
+git -C /tmp/xournal branch
+git -C /tmp/xournal log  --oneline | wc -l
+git -C /tmp/xournal log  --oneline --glob='*' | wc -l
+git -C /tmp/xournal checkout remotes/origin/next
+git -C /tmp/xournal branch
+git -C /tmp/xournal log  --oneline | wc -l
+git -C /tmp/xournal log  --oneline --glob='*'| wc -l
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Already on 'master'
+Your branch is up-to-date with 'origin/master'.
+*master
+171
+352
+Note: checking out 'remotes/origin/next'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b <new-branch-name>
+
+HEAD is now at 031f268... merged kinetic scroll by Immi
+*(HEAD detached at origin/next)
+  master
+231
+352
+#+end_example
+
+
 
 * Parents
 
 The DAG is the fundamental data structure of git
 
 - Every commit has zero or more parents
-- Merges have two or more parents (I have seen 16 parents in one commit)
-- Current heads of branches (including master) might have zero children (at least on branch will always have zero children)
+- Current heads of branches (including master) might have zero children
+  - At least one branch will always have zero children
+  - A branch head with children means it has been merged
 - Roots of the branches have zero parents 
 
 #+BEGIN_SRC sh
@@ -411,8 +631,33 @@ ae37e72839ae59308974b9375eae0c8630c4795c;a40e13ec95dc9b8fbc1578ec5be8cbce6e7c839
 addb9bf2c0be2ff61e72d3c565253d319311d2f8;f28489f7f7477e59a9015e17a795c88ab89d977d
 #+end_example
 
+* Parents...
 
-** Roots:
+- Merges with more than 2 parents are called /octupus/ merge
+  - From Linus, regarding an octupus merge in the Kernel (Jan 2014).
+
+  #+BEGIN_EXAMPLE
+Christ. When you start doing octopus merges, you don't do it by half
+measures, do you?
+
+I just pulled the sound updates from Takashi, and as a result got your
+merge commit 2cde51fbd0f3. That one has 66 parents.
+
+That kind of merge either needs to be split up, or gitk needs to be
+made better about visualizing it, because it ends up being *so* wide
+that the history is hard to read.
+  #+END_EXAMPLE
+
+
+* Parents...
+
+- Parents are ordered
+  - First parent determines the branch in which the merge was applied
+  - Merging strategy determines how to resolve merges (an option of git merge)
+  - If the merge has a patch associated with it, 
+    - then there was a merge conflict and that patch is the manual fix
+
+* Roots:
 
 - there might be more than one root (linux has 4, git has more)
 - commits without parents
@@ -422,138 +667,162 @@ addb9bf2c0be2ff61e72d3c565253d319311d2f8;f28489f7f7477e59a9015e17a795c88ab89d977
 - You can ask for only merges
 
 #+BEGIN_SRC sh
-git -C /tmp/xournal log --merges -5 --glob='*' --pretty='%H;%P'
+git -C /tmp/xournal log --merges -5 --glob='*' --pretty='%H %P'
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-c08da1d700a818cada297aee949b40da780b536e;661075ab91e296fb5b702be379967bd581290942 03b7651644aea0a95fd09f1566d4a667df8d7950
-661075ab91e296fb5b702be379967bd581290942;ae37e72839ae59308974b9375eae0c8630c4795c addb9bf2c0be2ff61e72d3c565253d319311d2f8
-ae37e72839ae59308974b9375eae0c8630c4795c;a40e13ec95dc9b8fbc1578ec5be8cbce6e7c839c f28489f7f7477e59a9015e17a795c88ab89d977d
-69d03075893cd69390b58f25d9c94390302e87f3;ceef9524bc5be69c1ae26985f47cbd96d49066cf 37ab0d2142fcd605047480e4c838a463691ef067
-ceef9524bc5be69c1ae26985f47cbd96d49066cf;59c4b8f96d0d5ab9b26324976358ec4fbfa255eb c10f6e8d0793a40bd6e19fad861194bd40b0ffec
+031f268cf4ee67bb2e26bfe0a842fa48352b6d24 b8712f4ba54ed72e4b2b2a3829620cfa86740d9c ef22a4356ac80742242aff8906eec646b8692071
+5a47ec2006f731234f4aeb59c45ad88b051dc91a 6bb4780799f7480eaebf1737a851739595db599c 356bed06c8b3370ac74d9c7c8c316b9c56cdeebe
+0b2aee20e9d102235e006a0a11581e4914111de2 84b90eae4bbbe63d073d321ca1a594042e690c69 f503bba9ff65b45ead76ffa6372f050a90bd4b06
+84b90eae4bbbe63d073d321ca1a594042e690c69 c08da1d700a818cada297aee949b40da780b536e 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
+c08da1d700a818cada297aee949b40da780b536e 661075ab91e296fb5b702be379967bd581290942 03b7651644aea0a95fd09f1566d4a667df8d7950
 #+end_example
+
+* Files modified
+
+- Several ways to extract it:
+
+| --numstat |
+| --stat    |
+
+** --numstat
 
 #+BEGIN_SRC sh
-git -C /tmp/xournal log --pretty='%H;%P' | tail -5
+git  -C /tmp/xournal log -2 --numstat 
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-bdd9b21324587503275e285acdf9ba19c82d83b8;bcdd3a0382ffaa7fb9e117500403a6360b2ef5b2
-bcdd3a0382ffaa7fb9e117500403a6360b2ef5b2;1aaa40619a8afc55fdd4d6fe4f883aa0cf237bd3
-1aaa40619a8afc55fdd4d6fe4f883aa0cf237bd3;48d831491f93ea65d3fe9c27933ba33c3e303295
-48d831491f93ea65d3fe9c27933ba33c3e303295;9d02cbbbc188127f49e59daa56f783db1312e53d
-9d02cbbbc188127f49e59daa56f783db1312e53d;
+commit 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Wed Aug 17 10:03:35 2016 -0700
+
+    Add .gitignore
+
+24	0	.gitignore
+
+commit 565e4cb0c1e59fe19c7520c3171e21beb948a143
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Fri Jul 15 23:24:12 2016 +0200
+
+    fix crash when pasting text or images via xclip (bug #171)
+
+1	0	ChangeLog
+1	2	src/xo-clipboard.c
 #+end_example
 
-
-* Files modified: do not use --numstat, and never _ever_ think of using --stat
-
-- There are several ways to get the files modified in a commit
+** --stat
 
 #+BEGIN_SRC sh
-git  -C /tmp/xournal log -5 --numstat 
+git  -C /tmp/xournal log -2 --stat 
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-commit 03b7651644aea0a95fd09f1566d4a667df8d7950
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:36 2016 +0200
-
-    update readme.org
-
-26	21	README.org
-
-commit addb9bf2c0be2ff61e72d3c565253d319311d2f8
-Author: dmg <dmg@uvic.ca>
-Date:   Sat Nov 23 10:59:37 2013 +0900
-
-    Added readme.org to distinguish this repo from upstream
-
-128	0	README.org
-
-commit f28489f7f7477e59a9015e17a795c88ab89d977d
+commit 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
 Author: Denis Auroux <auroux@users.sourceforge.net>
-Date:   Tue Apr 5 14:51:54 2016 -0700
+Date:   Wed Aug 17 10:03:35 2016 -0700
 
-    text and image tools activate on button release instead of button press, to avoid subsequent confusion between clicks in toolbar and drawing area
+    Add .gitignore
 
-5	1	ChangeLog
-16	2	src/xo-callbacks.c
-2	0	src/xournal.h
+ .gitignore | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-commit 1b6ef5a24461b72bf2e98f1bfaad3567f0b9f542
+commit 565e4cb0c1e59fe19c7520c3171e21beb948a143
 Author: Denis Auroux <auroux@users.sourceforge.net>
-Date:   Thu Dec 3 12:24:17 2015 -0800
+Date:   Fri Jul 15 23:24:12 2016 +0200
 
-    Allow input coordinates greater than a million pixels (bug #166)
+    fix crash when pasting text or images via xclip (bug #171)
 
-1	1	src/xo-misc.c
-
-commit c10f6e8d0793a40bd6e19fad861194bd40b0ffec
-Author: Denis Auroux <auroux@users.sourceforge.net>
-Date:   Sat Oct 24 21:35:11 2015 -0700
-
-    Look for toolbar pixmaps first in configured install directory and then near
-    argv[0], instead of the other way around (bug #164)
-
-3	3	src/main.c
+ ChangeLog          | 1 +
+ src/xo-clipboard.c | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 #+end_example
+
+** How they deal with added files:
+
+None of them identify files added or removed
+
+- in this commit, the file po/ja.po was added
+
+#+BEGIN_SRC sh :cmdline -v
+printf "With --stat\n\n"
+git  -C /tmp/xournal log -1  --stat  8e7af75f1c297a0144fce9db84450d4b9fff7090
+printf "\nWith --numstat\n\n"
+git  -C /tmp/xournal log -1  --numstat  8e7af75f1c297a0144fce9db84450d4b9fff7090
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+With --stat
+
+commit 8e7af75f1c297a0144fce9db84450d4b9fff7090
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Fri Nov 22 10:52:32 2013 -0800
+
+    Add Japanese translation (by Hiroshi Saito)
+
+ AUTHORS           |    4 +-
+ ChangeLog         |    1 +
+ po/ChangeLog      |    1 +
+ po/LINGUAS        |    1 +
+ po/Makefile.in.in |  280 ------------
+ po/ja.po          | 1277 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 1282 insertions(+), 282 deletions(-)
+
+With --numstat
+
+commit 8e7af75f1c297a0144fce9db84450d4b9fff7090
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Fri Nov 22 10:52:32 2013 -0800
+
+    Add Japanese translation (by Hiroshi Saito)
+
+2	2	AUTHORS
+1	0	ChangeLog
+1	0	po/ChangeLog
+1	0	po/LINGUAS
+0	280	po/Makefile.in.in
+1277	0	po/ja.po
+#+end_example
+
+
+** issues with --numstat or --stat
 
 Several issues:
 
-- it does not indicate if the file is added or removed
+- git log does not indicate if the file is added or removed
 - it does not output numbers of added/deleted for binary files (only - -)
-- Time consuming:
+- Time consuming: it requires computing a diff
   - A simple test: git log -100000 (log of 10k commits) of the linux kernel
-  - --numstat or --stat 66 seconds
-  - --raw (see below): 10 seconds
+    | --numstat | 66 seconds |
+    | --stat    | 66 seconds |
+    | --raw     | 10 seconds |
 
 ** Better solution: --raw
 
 #+BEGIN_SRC sh
-git  -C /tmp/xournal log -3 --no-abbrev --raw 
+git  -C /tmp/xournal log -1 --no-abbrev --raw  8e7af75f1c297a0144fce9db84450d4b9fff7090
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-commit 03b7651644aea0a95fd09f1566d4a667df8d7950
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:36 2016 +0200
-
-    update readme.org
-
-:100644 100644 8b69815b87e05a3cdcc77c4f6248f9703f8c108f 7f2fe5eed121663f434adbea6d292e35471330f5 M	README.org
-
-commit addb9bf2c0be2ff61e72d3c565253d319311d2f8
-Author: dmg <dmg@uvic.ca>
-Date:   Sat Nov 23 10:59:37 2013 +0900
-
-    Added readme.org to distinguish this repo from upstream
-
-:000000 100644 0000000000000000000000000000000000000000 8b69815b87e05a3cdcc77c4f6248f9703f8c108f A	README.org
-
-commit f28489f7f7477e59a9015e17a795c88ab89d977d
+commit 8e7af75f1c297a0144fce9db84450d4b9fff7090
 Author: Denis Auroux <auroux@users.sourceforge.net>
-Date:   Tue Apr 5 14:51:54 2016 -0700
+Date:   Fri Nov 22 10:52:32 2013 -0800
 
-    text and image tools activate on button release instead of button press, to avoid subsequent confusion between clicks in toolbar and drawing area
+    Add Japanese translation (by Hiroshi Saito)
 
-:100644 100644 313f6609b13e5fe968e9d3394cb7de4585d6625b bd538e19ff86040d9f84ee369d511f8b41042311 M	ChangeLog
-:100644 100644 95fc7ddc2a6127f0c9f84bfab60babc1852d02bb 128078fb76e9c246a9199a6f33dbf4600f266590 M	src/xo-callbacks.c
-:100644 100644 044385738b2f0372959e74738e4566a7323a9f30 66e685007e17d9c7305ec56cf7272dc376fd35e6 M	src/xournal.h
+:100644 100644 b06824a1794b3fc57e6f20daf5d08d7a1676cabd a75eb8323c5e436b1575e298d15c2fb55d239989 M	AUTHORS
+:100644 100644 9e94a076aa0d43fd1fb2334b841d26c697bf78f3 4362844c11e55d54b05475878ed094e1654dabdf M	ChangeLog
+:100644 100644 e4842ac28c06f8ecc1c890d8a40274bd2748bcb9 4183b0780214178c84aa17583a45a47c5e7bd050 M	po/ChangeLog
+:100644 100644 5f08a210539c0397bbfe46d4e98fdbe9b07c60b4 9c24ed16b02d55023e7eeba7323d31280f559ceb M	po/LINGUAS
+:100644 000000 53b496dc6896de97115014f78ade708b766a6fc1 0000000000000000000000000000000000000000 D	po/Makefile.in.in
+:000000 100644 0000000000000000000000000000000000000000 9fcb55aed95a2c5c5a01c0b6e1d2a145bd21d9cd A	po/ja.po
 #+end_example
 
-
-** format
-
-#+BEGIN_EXAMPLE
-:100644 100644 313f6609b13e5fe968e9d3394cb7de4585d6625b bd538e19ff86040d9f84ee369d511f8b41042311 M	ChangeLog
-:100644 100644 95fc7ddc2a6127f0c9f84bfab60babc1852d02bjb 128078fb76e9c246a9199a6f33dbf4600f266590 M	src/xo-callbacks.c
-:100644 100644 044385738b2f0372959e74738e4566a7323a9f30 66e685007e17d9c7305ec56cf7272dc376fd35e6 M	src/xournal.h
-#+END_EXAMPLE
+Fields:
 
 | File mode before |                                          |
 | File mode after  |                                          |
@@ -569,56 +838,86 @@ For merges, it contains n+1 info:
 
 but only when the merge included a patch
 
-** --name-status
-
-- Easier to parse
-- but it does not track renames (files appear deleted and added)
-  - unless it is run with one filename and --follow (see below)
+** Files modiefied: --name-status
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --name-status -5
+git  -C /tmp/xournal log --oneline --no-abbrev -1 --name-status 8e7af75f1c297a0144fce9db84450d4b9fff7090
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7 Merge pull request #4078 from etehtsea/bump-racc
-0f717cf68d04824bfd5d1c66bcc40012176b15d1 Merge pull request #4085 from etehtsea/rm-lib-gitignore
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444 Remove lib/.gitignore
-M	.gitignore
-D	lib/.gitignore
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff Fixes #3778. Unicode chars in method names aren't accepted
-M	core/src/main/java/org/jruby/ext/ripper/RipperLexer.java
-M	core/src/main/java/org/jruby/lexer/yacc/RubyLexer.java
-30594f467c2fe9165f263dd38796de5296c5576e Define module_function singleton method as proper clone.
-M	core/src/main/java/org/jruby/runtime/Helpers.java
+8e7af75f1c297a0144fce9db84450d4b9fff7090 Add Japanese translation (by Hiroshi Saito)
+M	AUTHORS
+M	ChangeLog
+M	po/ChangeLog
+M	po/LINGUAS
+D	po/Makefile.in.in
+A	po/ja.po
 #+end_example
+
+- Subset info of --raw
+- Easier to parse
+
+** When to use 
+
+- *--numstat/--stat*: When you need the "churn"
+- *--raw*: when you need the files that were modified/added/removed 
+
 
 You can now easily preprocess the data to load it into our database
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --name-status -10 | perl withCid.pl  | egrep $';.\t'  | perl -pe 's/\t/;/'
+git  -C /tmp/xournal log --oneline --no-abbrev --name-status -10  | perl withCid.pl  | egrep $';;'  | perl -pe 's/\t/;/;s/;;/;/;'
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;M;.gitignore
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;D;lib/.gitignore
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;M;core/src/main/java/org/jruby/ext/ripper/RipperLexer.java
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;M;core/src/main/java/org/jruby/lexer/yacc/RubyLexer.java
-30594f467c2fe9165f263dd38796de5296c5576e;M;core/src/main/java/org/jruby/runtime/Helpers.java
-c5028dc54fa9a934273837758bf3040af1bb66a5;M;spec/ruby/core/module/module_function_spec.rb
-2d5e038c692ec8b913c8b21197bad9b9f0d73772;M;lib/pom.rb
-2d5e038c692ec8b913c8b21197bad9b9f0d73772;M;lib/pom.xml
-150c83d5cdd1b39b2802d74ff0b692db3f95fbc5;M;core/src/main/java/org/jruby/RubyArray.java
-45ed5f5af5b47e4039341275b538ac4015b71778;M;pom.rb
-45ed5f5af5b47e4039341275b538ac4015b71778;M;pom.xml
+015aa5dfb1b612c208192cfb9692d1eb6b8fd297;A;.gitignore
+565e4cb0c1e59fe19c7520c3171e21beb948a143;M;ChangeLog
+565e4cb0c1e59fe19c7520c3171e21beb948a143;M;src/xo-clipboard.c
+50184f046f8dc80b145805aaec34ceb4a41781f6;M;ChangeLog
+50184f046f8dc80b145805aaec34ceb4a41781f6;M;src/xo-callbacks.c
+f15bc362de2c5401600c420395b765566c2152e1;M;ChangeLog
+f15bc362de2c5401600c420395b765566c2152e1;M;src/xo-file.c
+f15bc362de2c5401600c420395b765566c2152e1;M;src/xournal.h
+f28489f7f7477e59a9015e17a795c88ab89d977d;M;ChangeLog
+f28489f7f7477e59a9015e17a795c88ab89d977d;M;src/xo-callbacks.c
+f28489f7f7477e59a9015e17a795c88ab89d977d;M;src/xournal.h
+1b6ef5a24461b72bf2e98f1bfaad3567f0b9f542;M;src/xo-misc.c
+c10f6e8d0793a40bd6e19fad861194bd40b0ffec;M;src/main.c
+b885aab5d6c3e836c844d27ed6919ef4e1292c9c;M;src/main.c
+f5c777d4e081a886baed8bbe2aee4d84b3562722;M;src/xo-callbacks.c
+2b74a01bae6c282e12006579cf285e21c847472e;M;src/xo-file.c
 #+end_example
 
-** Example of rename
 
-this file was renamed more than once. 
+* Renames
+
+this file was renamed more than once (jruby)
 
 #+BEGIN_EXAMPLE
 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
 #+END_EXAMPLE
+
+#+BEGIN_SRC sh
+git -C /tmp/jruby log --oneline --follow -10 -- truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java 
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+745fccc [Truffle] File rename case error.
+7f591b6 [Truffle] Stop implementing POSIX.
+e2de847 [Truffle] getpid can be done in the POSIXHandler.
+4ae93d2 [Truffle] .posix package.
+f4d6315 [Truffle] Make it clear that Ruby is the JRuby runtime.
+a157011 [Truffle] Organise imports.
+30d975e [Truffle] Update copyright years - mostly moves but I'll run it anyway as Git will give the correct history if needs be.
+29c937f [Truffle] Exception package.
+587a1a6 [Truffle] Move a bunch of stuff out of runtime.
+85e3ab5 [Truffle] Move context and language to the top level.
+#+end_example
+
+** How different commands report it
 
 Her is an example of how this rename is reported by different runs of git log on one of the commits that did the rename
 
@@ -628,11 +927,11 @@ Using --stat
 git  -C /tmp/jruby log --oneline --no-abbrev --stat 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
 745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
- .../platform/posix/TrufflePOSIXHandler.java        | 90 ----------------------
- .../platform/posix/TrufflePosixHandler.java        | 90 ++++++++++++++++++++++
- 2 files changed, 90 insertions(+), 90 deletions(-)
+ .../platform/posix/{TrufflePOSIXHandler.java => TrufflePosixHandler.java} | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
 #+end_example
 
 Using --numstat
@@ -641,10 +940,10 @@ Using --numstat
 git  -C /tmp/jruby log --oneline --no-abbrev --numstat 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
 745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
-0	90	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
-90	0	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+0	0	truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java => TrufflePosixHandler.java}
 #+end_example
 
 Using --name-status
@@ -653,10 +952,10 @@ Using --name-status
 git  -C /tmp/jruby log --oneline --no-abbrev --name-status 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
 745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
-D	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
-A	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
 #+end_example
 
 Using --summary
@@ -665,203 +964,214 @@ Using --summary
 git  -C /tmp/jruby log --oneline --no-abbrev --summary 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
 745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
- delete mode 100644 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
- create mode 100644 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+ rename truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java => TrufflePosixHandler.java} (100%)
 #+end_example
 
 Using --raw
-
-this is the only way to be sure it was a rename (see the blob ids before and after)
 
 #+BEGIN_SRC sh
 git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
 745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
-:100644 000000 3b785cd8bfee363b17097a118673bc6d9d14185f 0000000000000000000000000000000000000000 D	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
-:000000 100644 0000000000000000000000000000000000000000 3b785cd8bfee363b17097a118673bc6d9d14185f A	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+:100644 100644 3b785cd8bfee363b17097a118673bc6d9d14185f 3b785cd8bfee363b17097a118673bc6d9d14185f R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
 #+end_example
 
+** Renames.. that R...
 
-* How to track renames: use --follow
-
-Make sure you read the man pages of git log and git blame regarding rename detection and how it works.
-
-Using --numstat
+- What is that number after the R? 
+  - how similar the old and the new versions are
+- when a file is deleted and another one is added, git computes a similarity metric
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --numstat --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep '=>' -B 1
+git -C /tmp/jruby log --name-status --oneline --no-abbrev | egrep '^R'  | head -5
 #+END_SRC
 
 #+RESULTS:
 #+begin_example
-745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
-0	0	truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java => TrufflePosixHandler.java}
---
-4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb [Truffle] .posix package.
-1	1	truffle/src/main/java/org/jruby/truffle/platform/{ => posix}/TrufflePOSIXHandler.java
---
-587a1a6a2c739d89bd600c1ea00be5597a24e4e8 [Truffle] Move a bunch of stuff out of runtime.
-1	1	truffle/src/main/java/org/jruby/truffle/{runtime/subsystems => platform}/TrufflePOSIXHandler.java
+R100	spec/truffle/specs/truffle/digest.rb	spec/truffle/specs/truffle/digest_spec.rb
+R087	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java	truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+R081	truffle/src/main/java/org/jruby/truffle/parser/LazyTranslationNode.java	truffle/src/main/java/org/jruby/truffle/language/LazyRubyNode.java
+R088	truffle/src/main/java/org/jruby/truffle/language/RubySourceSection.java	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java
+R080	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRMetaClassBody.java	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRNoProtocolMethod.java
 #+end_example
 
-
-using --raw
-- easier to parse
+Let us add the commit id using our command withCid.pl:
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --raw --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep 'R[0-9]*'$'\t' -B 1
+git -C /tmp/jruby log --name-status --oneline --no-abbrev | perl withCid.pl | grep ';;R' | head -10
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
-:100644 100644 3b785cd8bfee363b17097a118673bc6d9d14185f 3b785cd8bfee363b17097a118673bc6d9d14185f R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
---
-4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb [Truffle] .posix package.
-:100644 100644 ab689cf579d1c58da2eed0d9e6ffc4668d421933 acb5afa1cd637aad029c3eeee000995e6f0e03e2 R098	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
---
-587a1a6a2c739d89bd600c1ea00be5597a24e4e8 [Truffle] Move a bunch of stuff out of runtime.
-:100644 100644 d6467a8cb455990190ba732e04dabd710de023f0 3ecee7df1866cc4582b40d8425bc3cbc87274b6b R098	truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+4975495fe0459141f0df6306f522fe5673f61b03;;R100	spec/truffle/specs/truffle/digest.rb	spec/truffle/specs/truffle/digest_spec.rb
+62068e649dbd1f6d923de8cc52f2ff6fc0b65463;;R087	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java	truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+177282c270e14c4ec35821e7359f9aad62b84043;;R081	truffle/src/main/java/org/jruby/truffle/parser/LazyTranslationNode.java	truffle/src/main/java/org/jruby/truffle/language/LazyRubyNode.java
+b2df8ddc031a63779a4b91bfa63cf1cedf906b6e;;R088	truffle/src/main/java/org/jruby/truffle/language/RubySourceSection.java	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java
+4da4c1676fa8799a9214eb6745613cfdc4430353;;R080	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRMetaClassBody.java	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRNoProtocolMethod.java
+1477ccc5a0b2a6f277fb6c398169c4fac3c74062;;R091	truffle/src/main/java/org/jruby/truffle/parser/KeyValuePair.java	truffle/src/main/java/org/jruby/truffle/collections/Tuple.java
+65b84d2a2e25626ec5e6593289e5a1c7b13f0b38;;R066	truffle/src/main/java/org/jruby/truffle/algorithms/Random.java	truffle/src/main/java/org/jruby/truffle/algorithms/Randomizer.java
+b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R095	truffle/src/main/java/org/jruby/truffle/datastructures/BoundaryIterable.java	truffle/src/main/java/org/jruby/truffle/collections/BoundaryIterable.java
+b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R095	truffle/src/main/java/org/jruby/truffle/datastructures/BoundaryIterator.java	truffle/src/main/java/org/jruby/truffle/collections/BoundaryIterator.java
+b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R099	truffle/src/main/java/org/jruby/truffle/datastructures/IntHashMap.java	truffle/src/main/java/org/jruby/truffle/collections/IntHashMap.java
 #+end_example
 
+** Rename: what is the actual diff
 
-Using --name-status
+Example of a rename:
 
-- Easier to parse
+#+BEGIN_SRC bash
+git -C /tmp/jruby log -1 --raw 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep TempSource
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+    [Truffle] Rename TempSourceSection to SourceIndexLength and move.
+:100644 100644 f06d224... 7bc9443... R087	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java	truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+#+end_example
+
+but the diff reports all the additions and deletions
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --name-status --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | egrep '^R' -B 1
+git -C /tmp/jruby diff 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 -- truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java | head -10
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
-R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
---
-4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb [Truffle] .posix package.
-R098	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
---
-587a1a6a2c739d89bd600c1ea00be5597a24e4e8 [Truffle] Move a bunch of stuff out of runtime.
-R098	truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
+diff --git a/truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java b/truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+deleted file mode 100644
+index 7bc9443..0000000
+--- a/truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/*
+- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved. This
+- * code is released under a tri EPL/GPL/LGPL license. You can use it,
+- * redistribute it and/or modify it under the terms of the:
 #+end_example
 
-Using --name-only
-- this will give you the file name after each commit to it.
+* git does not store diffs
+
+- it computes them
+- but it stores metadata about what the type of change a file suffered (rename, addition, deletion)
+- even for a rename, it stores before-and-after
+
+you can also see the "churn" in the rename with --numstat
 
 #+BEGIN_SRC sh
-git  -C /tmp/jruby log --oneline --no-abbrev --format='%H%%' --name-only --follow truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java | grep -v '^$' | perl -pe 's/%\n/;/;'
+git -C /tmp/jruby log -1 --numstat 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep TempSource
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-9c4d56599e1eeed93669529922058be0285e6cca;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
-c3fb92da93b482b09952e5e949c68c933a82e6f7;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
-0e2c04cc75f067fffaade09cc55acb7c198e5615;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
-b3046e5cb1ecc88a2160b71b45f606d3be39873b;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
-745fcccc684131c16159523c277de01737d764f0;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
-7f591b655c0ff8893d28bebc9a5e67845736dafc;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
-e2de84746d9c710ee08d215dbad1bb4c7cf06227;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
-4ae93d213a715cacc2ca9b4fac116fe06a9c6ceb;truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
-f4d6315eec130b82a003eabab0cff501452af595;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
-a15701111fcce340fd1e51f85c6783c33d9be896;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
-30d975e6abdb1bdab1b80b0bfbd83313f139f8a2;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
-29c937f3919d11ae3b054d128a929e4d9c09a2ce;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
-587a1a6a2c739d89bd600c1ea00be5597a24e4e8;truffle/src/main/java/org/jruby/truffle/platform/TrufflePOSIXHandler.java
-85e3ab5c7d27aaecc2d5299aef9d5ec8c80ce807;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-b59bdd5da37797c4d9c49c6500f40e697605752e;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-0765614df5efdd96da75d046c16321ce8bb0be29;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-87e8ba49649f42e7f152e522cc32030a7cb74743;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-d9ab72f4483abf7c61b12fd6515186806987f527;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-3d9f6f15d9176193482726dc63b681c11c175aff;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-9c22b944910b18607add8d7d1cb13653a3913a9a;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-5a97a52593071c9fe0e13a3660f59ebd5c4d968e;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-329a0ddc9b0253850336d2a7c0c7e4036fa762b9;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
-6d50e0430e71539faba437412f9ebd8eec211497;truffle/src/main/java/org/jruby/truffle/runtime/subsystems/TrufflePOSIXHandler.java
+    [Truffle] Rename TempSourceSection to SourceIndexLength and move.
+3	3	truffle/src/main/java/org/jruby/truffle/{parser/TempSourceSection.java => language/SourceIndexLength.java}
 #+end_example
-
 
 * Extracting versions of files
 
 - Git stores the actual contents of the files: the blobs
-- *do not extract using git checkout*. it is very slow
+  - they might be compacted (to save space)
+- *do not extract using git checkout*. 
+  - it is very slow
+  - and it recreates the entire filesystem at the commit
 - The --raw option gives you the blob of a given file before and after the commit is executed:
+  - fields after the file mode
 
 #+BEGIN_SRC sh
-git  -C /tmp/xournal log -1 --no-abbrev --raw 
+git  -C /tmp/xournal log -1 --no-abbrev --raw  README
 #+END_SRC
 
 
+#+RESULTS:
 #+begin_example
-commit 03b7651644aea0a95fd09f1566d4a667df8d7950
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:36 2016 +0200
+commit ab94f7e668505f9080796a5b52cd9a00c81a9326
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Sun Jun 29 09:56:18 2014 +0200
 
-    update readme.org
+    Bump version number ahead of release 0.4.8
 
-:100644 100644 8b69815b87e05a3cdcc77c4f6248f9703f8c108f 7f2fe5eed121663f434adbea6d292e35471330f5 M	README.org
+:100644 100644 37cbe88fe37fd54433af43e61c9590a9fcfc8a76 4b2c36af80202e29b88b75d5689e125bb64b5fa4 M	README
 #+end_example
 
-You can extract the contents of file in two ways: 
 
-** by cid:filename
+** git show
+
+You can extract the contents of file using git show in two ways: 
+
+- by commit-id and filename
+- by blob-id
+
+** cid:filename 
 
 - You need to use the filename at the time of the commit (in case it was later renamed)
 
 #+BEGIN_SRC sh
-git -C /tmp/xournal show 03b7651644aea0a95fd09f1566d4a667df8d7950:README.org | head
+git -C /tmp/xournal show ab94f7e668505f9080796a5b52cd9a00c81a9326:README | head
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-#+STARTUP: showall
+Version 0.4.8 (June 30, 2014)
 
-* This is a testing repository for new features of Xournal
+Installation:  see INSTALL
+User's manual: see html-doc/manual.html
+Updates:       see http://xournal.sourceforge.net/
 
-This is a mirror of the git repository of Xournal
-(http://xournal.sourceforge.net) and contains experimental code that
-is not yet in the official repo. Its purpose is to help in the
-development of new features
-
-It should *not be used* for code intended for further distribution.
+See also: http://sourceforge.net/projects/xournal
 #+end_example
+
 
 ** by blob
 
 #+BEGIN_SRC sh
-git -C /tmp/xournal show 7f2fe5eed121663f434adbea6d292e35471330f5 | head
+git -C /tmp/xournal show 4b2c36af80202e29b88b75d5689e125bb64b5fa4 | head
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-#+STARTUP: showall
+Version 0.4.8 (June 30, 2014)
 
-* This is a testing repository for new features of Xournal
+Installation:  see INSTALL
+User's manual: see html-doc/manual.html
+Updates:       see http://xournal.sourceforge.net/
 
-This is a mirror of the git repository of Xournal
-(http://xournal.sourceforge.net) and contains experimental code that
-is not yet in the official repo. Its purpose is to help in the
-development of new features
-
-It should *not be used* for code intended for further distribution.
+See also: http://sourceforge.net/projects/xournal
 #+end_example
+
+
+* blobid
+
+Any file/directory is recorded as a hash of its contents
+
+- git keeps track of the changes to the file system at each commit using this blob
+- it removes duplicated content
+- it makes it easy to know what a commit has changed
+  - and retrieve it
 
 ** How the blob id is computed:
 
-- Concatenate: 
+(this explains why the SHA1 vulnerability is not such a big issue for git)
+
+- SHA1 the concatenation of:
   - "blob "
   - ASCII length of the file
   - ASCII 0
   - Contents
 
-*** Example 
+** Example 
 
-Compute the blob of the current version of the file README.org and compare it against the lastest commit on that file
+Compute the blob of the current version of the file README and compare it against the lastest commit on that file
 
 #+BEGIN_SRC perl :results output
 use Digest::SHA qw(sha1_hex);
 
-$file = "README.org";
+$file = "README";
 chdir("/tmp/xournal");
 
 #read contents of file
@@ -875,38 +1185,64 @@ $len = length($contents);
 print sha1_hex("blob $len\0" . $contents);
 #+END_SRC
 
+#+RESULTS:
 #+begin_example
-7f2fe5eed121663f434adbea6d292e35471330f5
+4b2c36af80202e29b88b75d5689e125bb64b5fa4
 #+end_example
 
 #+BEGIN_SRC sh
-git -C /tmp/xournal  log --no-abbrev -1 --raw README.org 
+git -C /tmp/xournal  log --no-abbrev -1 --raw README
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
-commit 03b7651644aea0a95fd09f1566d4a667df8d7950
-Author: D German <dmg@uvic.ca>
-Date:   Wed Apr 20 11:04:36 2016 +0200
+commit ab94f7e668505f9080796a5b52cd9a00c81a9326
+Author: Denis Auroux <auroux@users.sourceforge.net>
+Date:   Sun Jun 29 09:56:18 2014 +0200
 
-    update readme.org
+    Bump version number ahead of release 0.4.8
 
-:100644 100644 8b69815b87e05a3cdcc77c4f6248f9703f8c108f 7f2fe5eed121663f434adbea6d292e35471330f5 M	README.org
+:100644 100644 37cbe88fe37fd54433af43e61c9590a9fcfc8a76 4b2c36af80202e29b88b75d5689e125bb64b5fa4 M	README
 #+end_example
 
 
-* What about who has modified a given file?
+* Modifications to a file
 
-git blame. It is very slow. It gives you the blame with respect to the current commit (head of the current branch). So
-make sure you run it after a checkout at the time you want to see the blame.
+- simply append the filename after the other git-log parameters
 
-By default is format is hard to parse:
+#+BEGIN_SRC sh
+git -C /tmp/xournal log --oneline --no-abbrev src/xo-file.c | head
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+f15bc362de2c5401600c420395b765566c2152e1 config option to create new file when trying to open non-existent .xoj
+2b74a01bae6c282e12006579cf285e21c847472e Fix issues with commas in config file (bug #161)
+f305d3bee6290b9a82680a186594619b8e217740 Fix includes to avoid implicitly defined function warnings.
+982874f254c3e03d4def80c44012f1e0bd222377 disable xinput during modal dialog boxes (bug #159)
+5c74a49542ef78cc31cf9df5a1284a53513bb8b2 option to export successive layers to separate PDF pages
+ac1af31bee3cdfcc8988c193e071d10d7167dea7 use GDK macros (not WIN32) to disable X11-specific code (T. Schoonjans)
+c34acb584baf71ef00086583b80d32f84e75bde0 Fix crash in ps/pdf bitmap background import via ghostscript
+57c8488b3c6ffe94917dcc417cd0027bfc2df55c fix a minor bug with save file paths in Windows (D. German)
+2cfa0f4174ce5456e22003bde152b6609df288e4 new Export to PDF code using cairo (+ config option to prefer old code)
+ad96f4135f5138afe3d7d20d9f88ae87ea7c0cfd option to auto-save documents and recover auto-saves
+#+end_example
+
+
+** who was the last to touch a given line?
+
+- use git blame. 
+- It can be slow. 
+- It gives you the blame with respect to the current commit (head of the current branch). So
+  make sure you run it after a checkout at the time you want to see the blame.
+
+By default its format is hard to parse (more on that later)
 
 #+BEGIN_SRC sh
 git -C /tmp/xournal blame src/xo-file.c | head
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    1) /*
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    2)  *  This program is free software; you can redistribute it and/or
@@ -920,9 +1256,37 @@ a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    9)  *  MERCHANTABILITY or FI
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000   10)  *  General Public License for more details.
 #+end_example
 
-It is also dangerous to use:
+** Be careful
 
-- The authors are mapped using the file .mailmap found in the root directory of the project
+- In git-blame
+  - The authors are mapped using the file .mailmap found in the root directory of the project
+
+** Example 1:
+
+From the git-blame documentation:
+
+*Example:* Your history contains commits by two authors, Jane and Joe, whose names appear in the repository under several forms:
+
+#+BEGIN_EXAMPLE
+Joe Developer <joe@example.com>
+Joe R. Developer <joe@example.com>
+Jane Doe <jane@example.com>
+Jane Doe <jane@laptop.(none)>
+Jane D. <jane@desktop.(none)>
+#+END_EXAMPLE
+
+Now suppose that Joe wants his middle name initial used, and Jane prefers her family name fully spelled out. A proper
+*.mailmap* file would look like:
+
+#+BEGIN_EXAMPLE
+Jane Doe         <jane@desktop.(none)>
+Joe R. Developer <joe@example.com>
+#+END_EXAMPLE
+         
+
+** Example
+
+This is the top of .mailmap from the linux kernel
 
 #+BEGIN_SRC 
 #
@@ -931,32 +1295,99 @@ It is also dangerous to use:
 # and/or not always written the same way, making contributions from the
 # same person appearing not to be so or badly displayed.
 #
-# repo-abbrev: /pub/scm/linux/kernel/git/
+p# repo-abbrev: /pub/scm/linux/kernel/git/
 #
-Boris Brezillon <boris.brezillon@free-electrons.com> <b.brezillon.dev@gmail.com>
-James Bottomley <jejb@mulgrave.(none)>
-James Bottomley <jejb@titanic.il.steeleye.com>
-James E Wilson <wilson@specifix.com>
-James Ketrenos <jketreno@io.(none)>
-<javier@osg.samsung.com> <javier.martinez@collabora.co.uk>
+
+Aaron Durbin <adurbin@google.com>
+Adam Oldham <oldhamca@gmail.com>
+Adam Radford <aradford@gmail.com>
+Adrian Bunk <bunk@stusta.de>
+Adriana Reus <adi.reus@gmail.com> <adriana.reus@intel.com>
+Alan Cox <alan@lxorguk.ukuu.org.uk>
 #+END_SRC
 
+For example: 
+
+#+BEGIN_EXAMPLE
+Adriana Reus <adi.reus@gmail.com> <adriana.reus@intel.com>
+#+END_EXAMPLE
+
+- Adriana Reus email is reported different in commands that use .mailmap. 
+  - including blame
+- *%an* returns name as in commit
+- *%aN* returns name mapped using .mailmap
+- *%ae* returns email as in commit
+- *%aE* returns email mapped using .mailmap
 #+BEGIN_SRC sh
-git -C /tmp/jruby log -6  --format='%H;author;%an;mailmapAuthor;%aN'
+git -C  /home/linux/original.repo/linux.git log --oneline --format='%H;author;%an;%ae;mailmapAuthor;%aN;%aE' | grep 'reus' | head -2
 #+END_SRC
 
 
+#+RESULTS:
 #+begin_example
-45e17306aa870f25094ebc4956e1b03ba12b24e7;author;Charles Oliver Nutter;mailmapAuthor;Charles Oliver Nutter
-0f717cf68d04824bfd5d1c66bcc40012176b15d1;author;Charles Oliver Nutter;mailmapAuthor;Charles Oliver Nutter
-9b4164f7c73247c1fd3c5e2e817d2d58bc56c444;author;Konstantin Shabanov;mailmapAuthor;Konstantin Shabanov
-cc1743cb60f9c3898a778f877ab3f4c46666e0ff;author;Thomas E. Enebo;mailmapAuthor;Thomas E. Enebo
-30594f467c2fe9165f263dd38796de5296c5576e;author;Charles Oliver Nutter;mailmapAuthor;Charles Oliver Nutter
-c5028dc54fa9a934273837758bf3040af1bb66a5;author;Charles Oliver Nutter;mailmapAuthor;Charles Oliver Nutter
+6c55c418f071dc7df2dfeb66398d009139cc5ef1;author;Adriana Reus;adi.reus@gmail.com;mailmapAuthor;Adriana Reus;adi.reus@gmail.com
+65ae47b0ec535a008e53578abc11082f3b742f75;author;Adriana Reus;adriana.reus@intel.com;mailmapAuthor;Adriana Reus;adi.reus@gmail.com
 #+end_example
 
 
-Another alternative: use porcelain (you also get the previous commit id for every line)
+This command uses raw user data:
+
+#+BEGIN_SRC sh
+git -C  /home/linux/original.repo/linux.git  log 65ae47b0ec535a008e53578abc11082f3b742f75 -1 | head
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+commit 65ae47b0ec535a008e53578abc11082f3b742f75
+Author: Adriana Reus <adriana.reus@intel.com>
+Date:   Thu Mar 24 11:29:31 2016 +0200
+
+    iio: accel: kxcjk-1013: optimize i2c transfers in trigger handler
+    
+    Some i2c busses (e.g.: Synopsys DesignWare I2C adapter) need to
+    enable/disable the bus at each i2c transfer and must wait for
+    the enable/disable to happen before sending the data.
+    
+#+end_example
+
+but this one uses mapped user data:
+
+#+BEGIN_SRC sh
+git -C  /home/linux/original.repo/linux.git  shortlog --email 65ae47b0ec535a008e53578abc11082f3b742f75 -1 | head
+#+END_SRC
+
+
+#+RESULTS:
+#+begin_example
+Adriana Reus <adi.reus@gmail.com> (1):
+      iio: accel: kxcjk-1013: optimize i2c transfers in trigger handler
+
+#+end_example
+
+
+** git-blame and  .mailmap
+
+- git blame maps users using .mailmap
+- so be careful when you parse its information 
+  - it might appear that the line is modified by the wrong person
+
+
+* --porcelain
+
+Many commands support --porcelain
+
+#+BEGIN_QUOTE
+"Porcelain" is the material from which toilets are usually made (and sometimes other fixtures such as washbasins). This
+is distinct from "plumbing" (the actual pipes and drains), where the porcelain provides a more user-friendly interface
+to the plumbing
+#+END_QUOTE
+
+http://stackoverflow.com/questions/6976473/what-does-the-term-porcelain-mean-in-git
+
+
+** git-blame porcelain
+
+it is useful when one need to parse
 
 | (author or commiter)-time | unix time in epoch                                               |
 | summary                   | one liner of commit log                                          |
@@ -969,7 +1400,7 @@ Another alternative: use porcelain (you also get the previous commit id for ever
 git -C /tmp/xournal blame --no-abbrev src/xo-file.c --line-porcelain | head -26
 #+END_SRC
 
-
+#+RESULTS:
 #+begin_example
 a71d76854d1caabd6bcc7fd1ce6a105fca06de61 1 1 15
 author Denis Auroux
@@ -1000,12 +1431,16 @@ filename src/xo-file.c
 #+end_example
 
 
-* Many commands have porcelain output
-
-- They make your processing easier
-
 * Final comments
 
 - Read the man pages
 - You can simplify your life by asking for the right info 
 
+* Ignore
+
+#+BEGIN_SRC emacs-lisp :exports none
+(setq org-image-actual-width 1000)
+(setq org-export-babel-evaluate  nil)
+#+END_SRC
+
+#+RESULTS:
