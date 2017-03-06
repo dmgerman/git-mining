@@ -3,7 +3,7 @@
 #+TAGS:
 #+SEQ_TODO: TODO STARTED DONE DEFERRED CANCELLED | WAITING DELEGATED APPT
 #+DRAWERS: HIDDEN STATE
-#+TITLE: Git mininig tutorial: part 1 --- the basics
+#+TITLE: Git mininig tutorial
 #+CATEGORY: 
 #+PROPERTY: header-args: lang           :varname value
 #+PROPERTY: header-args:sqlite          :db /path/to/db  :colnames yes
@@ -92,7 +92,7 @@ This creates a file called .git/FETCH_HEAD. It contains
 - branch name
 - location
 
-#+BEGIN_SRC sh :output both
+#+BEGIN_SRC sh :exports both
 head /tmp/repo/.git/FETCH_HEAD 
 #+END_SRC
 
@@ -110,7 +110,7 @@ e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7		branch 'master' of https://github.com/
 - This is the workhorse of mining git
 - You can extract *almost* everything with it
 
-#+BEGIN_SRC sh :output results
+#+BEGIN_SRC sh :exports both
 exec 2>&1
 git  log  --help  | head -20
 :
@@ -141,7 +141,7 @@ OPTIONS
 
 ** Default output
 
-#+BEGIN_SRC sh :output both
+#+BEGIN_SRC sh :results both
 git -C  /tmp/repo log -2
 #+END_SRC
 
@@ -172,7 +172,7 @@ Date:   Fri Feb 24 10:48:10 2017 -0800
 
 | --oneline    | one commit per line. 
 
-#+BEGIN_SRC sh :output both
+#+BEGIN_SRC sh :results both
 git -C  /tmp/repo log --oneline -5
 #+END_SRC
 
@@ -190,7 +190,7 @@ eccf97c Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'
 
 | --no-abbbrev | Force git to always give you full commit ids |
 
-#+BEGIN_SRC sh :output both
+#+BEGIN_SRC sh :results both
 git -C  /tmp/repo log -1 --oneline --no-abbrev -5
 #+END_SRC
 
@@ -294,7 +294,7 @@ c0588fd61aa6da96824eec60719c505b66239dd6;Author;Junio C Hamano <gitster@pobox.co
 
 * But git log is already capable of doing this: format
 
-#+BEGIN_SRC sh :output both
+#+BEGIN_SRC sh :results both
 man git-log  | egrep -A 20 'format:<string>$'
 #+END_SRC
 
