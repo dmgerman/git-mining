@@ -689,6 +689,12 @@ c08da1d700a818cada297aee949b40da780b536e 661075ab91e296fb5b702be379967bd58129094
 
 * Files modified
 
+* Blobs
+
+[[./data-model-4.png]]
+
+* Files modified...
+
 - Several ways to extract it:
 
 | --numstat |
@@ -1133,7 +1139,6 @@ Updates:       see http://xournal.sourceforge.net/
 
 See also: http://sourceforge.net/projects/xournal
 #+end_example
-
 
 ** by blob
 
