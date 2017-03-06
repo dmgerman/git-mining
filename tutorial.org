@@ -17,6 +17,8 @@ This file is information that I wish I had known when I started doing heavy mini
 
 * The DAG
 
+[[./dag.png]]
+
 - git records commits
 
 - commits create a DAG
