@@ -513,7 +513,7 @@ By default, git log gives you the log of the "current" branch
 
 - From the current commit backwards to the roots of the repo
 
-#+BEGIN_SRC sh :cmdline -v
+#+BEGIN_SRC sh :cmdline -v :exports both
 git -C /tmp/xournal checkout master
 git -C /tmp/xournal branch
 git -C /tmp/xournal log  -1
@@ -746,7 +746,7 @@ None of them identify files added or removed
 
 - in this commit, the file po/ja.po was added
 
-#+BEGIN_SRC sh :cmdline -v
+#+BEGIN_SRC sh :cmdline -v :exports both
 printf "With --stat\n\n"
 git  -C /tmp/xournal log -1  --stat  8e7af75f1c297a0144fce9db84450d4b9fff7090
 printf "\nWith --numstat\n\n"
@@ -1025,7 +1025,7 @@ b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R099	truffle/src/main/java/org/jruby/t
 
 Example of a rename:
 
-#+BEGIN_SRC bash
+#+BEGIN_SRC sh :exports both
 git -C /tmp/jruby log -1 --raw 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep TempSource
 #+END_SRC
 
