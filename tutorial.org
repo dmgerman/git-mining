@@ -852,7 +852,7 @@ For merges, it contains n+1 info:
 
 but only when the merge included a patch
 
-** Files modiefied: --name-status
+** Files modified: --name-status
 
 #+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log --oneline --no-abbrev -1 --name-status 8e7af75f1c297a0144fce9db84450d4b9fff7090
