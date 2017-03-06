@@ -79,6 +79,10 @@ git clone https://github.com/git/git repo
 
 * Branches
 
+[[./basic-branching-4.png]]
+
+* Branches
+
 If you also want a clean list of branches and their corresponding heads:
 
 #+BEGIN_SRC sh
