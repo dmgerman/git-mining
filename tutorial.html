@@ -1,0 +1,2520 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2017-03-06 Mon 13:40 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Git mininig tutorial: part 1 &#x2014; the basics</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Daniel M. German" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        displayAlign: "center",
+        displayIndent: "0em",
+
+        "HTML-CSS": { scale: 100,
+                        linebreaks: { automatic: "false" },
+                        webFont: "TeX"
+                       },
+        SVG: {scale: 100,
+              linebreaks: { automatic: "false" },
+              font: "TeX"},
+        NativeMML: {scale: 100},
+        TeX: { equationNumbers: {autoNumber: "AMS"},
+               MultLineWidth: "85%",
+               TagSide: "right",
+               TagIndent: ".8em"
+             }
+});
+</script>
+<script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Git mininig tutorial: part 1 &#x2014; the basics</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org6de02ba">1. Intro</a></li>
+<li><a href="#orgc75ffec">2. The DAG</a></li>
+<li><a href="#orgdb7e506">3. Commits</a></li>
+<li><a href="#org20bea11">4. Non-merge commits</a></li>
+<li><a href="#orgaba87ef">5. Merge commits</a></li>
+<li><a href="#org9f6ae7c">6. Cloning</a></li>
+<li><a href="#org34091ce">7. Branches</a></li>
+<li><a href="#org8969c7d">8. Git log</a>
+<ul>
+<li><a href="#orgf1bb371">8.1. Default output</a></li>
+<li><a href="#org2c67296">8.2. Some important git log options: oneline</a></li>
+<li><a href="#orgc59d871">8.3. Some important git log options: no-abbrev</a></li>
+</ul>
+</li>
+<li><a href="#org2616209">9. Git log can be parsed with a very simple finite state machine</a></li>
+<li><a href="#orgb7f2e35">10. But git log is already capable of doing this: format</a></li>
+<li><a href="#org3b6673c">11. git log format: most useful options</a></li>
+<li><a href="#orgf5b8de6">12. git log format&#x2026;</a></li>
+<li><a href="#org04568c7">13. You can easily import info into a database</a></li>
+<li><a href="#orgfb20fd3">14. Branches</a></li>
+<li><a href="#orgfab1dbe">15. Commits in Branches</a></li>
+<li><a href="#org6cf60b3">16. Commits in Branches&#x2026;</a></li>
+<li><a href="#orgb4f8559">17. Parents</a></li>
+<li><a href="#org0c97a8a">18. Parents&#x2026;</a></li>
+<li><a href="#org63ba25d">19. Parents&#x2026;</a></li>
+<li><a href="#orgce08467">20. Roots:</a>
+<ul>
+<li><a href="#org6201617">20.1. Merges</a></li>
+</ul>
+</li>
+<li><a href="#orgfce243c">21. Files modified</a>
+<ul>
+<li><a href="#org5b5a7a0">21.1. &#x2013;numstat</a></li>
+<li><a href="#org21ddadb">21.2. &#x2013;stat</a></li>
+<li><a href="#orgf9c591a">21.3. How they deal with added files:</a></li>
+<li><a href="#orgb38a6de">21.4. issues with &#x2013;numstat or &#x2013;stat</a></li>
+<li><a href="#org0a0fe1c">21.5. Better solution: &#x2013;raw</a></li>
+<li><a href="#orgd2a3a17">21.6. Files modiefied: &#x2013;name-status</a></li>
+<li><a href="#org87620e1">21.7. When to use</a></li>
+</ul>
+</li>
+<li><a href="#org85ea3fd">22. Renames</a>
+<ul>
+<li><a href="#org20632fb">22.1. How different commands report it</a></li>
+<li><a href="#orgcb6d673">22.2. Renames.. that R&#x2026;</a></li>
+<li><a href="#orgfa94ab8">22.3. Rename: what is the actual diff</a></li>
+</ul>
+</li>
+<li><a href="#orgd750b3e">23. git does not store diffs</a></li>
+<li><a href="#orgee65eb4">24. Extracting versions of files</a>
+<ul>
+<li><a href="#orgc807749">24.1. git show</a></li>
+<li><a href="#org69333c5">24.2. cid:filename</a></li>
+<li><a href="#orgb53c77d">24.3. by blob</a></li>
+</ul>
+</li>
+<li><a href="#org5402af7">25. blobid</a>
+<ul>
+<li><a href="#orgfc4b2a7">25.1. How the blob id is computed:</a></li>
+<li><a href="#org68c7f2e">25.2. Example</a></li>
+</ul>
+</li>
+<li><a href="#org9b1a142">26. Modifications to a file</a>
+<ul>
+<li><a href="#orga1aaa4b">26.1. who was the last to touch a given line?</a></li>
+<li><a href="#org6470d00">26.2. Be careful</a></li>
+<li><a href="#orge73a24f">26.3. Example 1:</a></li>
+<li><a href="#org578d874">26.4. Example</a></li>
+<li><a href="#org73fcba5">26.5. git-blame and  .mailmap</a></li>
+</ul>
+</li>
+<li><a href="#orgd93c6f6">27. &#x2013;porcelain</a>
+<ul>
+<li><a href="#orgb66f094">27.1. git-blame porcelain</a></li>
+</ul>
+</li>
+<li><a href="#org5320110">28. Final comments</a></li>
+<li><a href="#orgfa0dfd2">29. Ignore</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6de02ba" class="outline-2">
+<h2 id="org6de02ba"><span class="section-number-2">1</span> Intro</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This file is information that I wish I had known when I started doing heavy mining of git.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc75ffec" class="outline-2">
+<h2 id="orgc75ffec"><span class="section-number-2">2</span> The DAG</h2>
+<div class="outline-text-2" id="text-2">
+<ul class="org-ul">
+<li>git records commits</li>
+
+<li>commits create a DAG
+<ul class="org-ul">
+<li>Each commit has one or more parents (ordered)</li>
+<li>A commit with more than one parent is a merge-commit</li>
+</ul></li>
+
+<li>Most frequently the DAG is a tree 
+<ul class="org-ul">
+<li>one root commit</li>
+</ul></li>
+
+<li>But some projects have many roots
+<ul class="org-ul">
+<li>This is a <b>feature</b> of git: you can merge repos!!!</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgdb7e506" class="outline-2">
+<h2 id="orgdb7e506"><span class="section-number-2">3</span> Commits</h2>
+<div class="outline-text-2" id="text-3">
+<ul class="org-ul">
+<li>Commits record the state of the file system after each commit
+<ul class="org-ul">
+<li>What files/directories (and their attributes) exist
+<ul class="org-ul">
+<li>and what their contents are</li>
+</ul></li>
+</ul></li>
+<li>And metadata associated with it:
+<ul class="org-ul">
+<li>Who/when committed to the current repo (its committer)</li>
+<li>Who/when created the commit (its author)</li>
+</ul></li>
+
+<li>git does not store diffs!
+<ul class="org-ul">
+<li>which means diffs are expensive to compute</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org20bea11" class="outline-2">
+<h2 id="org20bea11"><span class="section-number-2">4</span> Non-merge commits</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li>Non-merge commits <b>always</b> have one single parent</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgaba87ef" class="outline-2">
+<h2 id="orgaba87ef"><span class="section-number-2">5</span> Merge commits</h2>
+<div class="outline-text-2" id="text-5">
+<ul class="org-ul">
+<li>Merge commits have multiple parents.</li>
+
+<li><p>
+Merges with more than 2 parents are called <i>octupus</i> merge
+</p>
+<ul class="org-ul">
+<li>From Linus, regarding an octupus merge in the Kernel (Jan 2014).</li>
+</ul>
+<pre class="example">
+Christ. When you start doing octopus merges, you don't do it by half
+measures, do you?
+
+I just pulled the sound updates from Takashi, and as a result got your
+merge commit 2cde51fbd0f3. That one has 66 parents.
+
+That kind of merge either needs to be split up, or gitk needs to be
+made better about visualizing it, because it ends up being *so* wide
+that the history is hard to read.
+</pre></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org9f6ae7c" class="outline-2">
+<h2 id="org9f6ae7c"><span class="section-number-2">6</span> Cloning</h2>
+<div class="outline-text-2" id="text-6">
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #006FE0;">cd</span> /tmp
+git clone https://github.com/git/git repo
+</pre>
+</div>
+
+<ul class="org-ul">
+<li>Cloning retrieves all commits in the repo</li>
+<li>And their tags</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org34091ce" class="outline-2">
+<h2 id="org34091ce"><span class="section-number-2">7</span> Branches</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+If you also want a clean list of branches and their corresponding heads:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/repo fetch --all
+</pre>
+</div>
+
+
+<p>
+This creates a file called .git/FETCH_HEAD. It contains
+</p>
+
+<ul class="org-ul">
+<li>commit id</li>
+<li>branch name</li>
+<li>location</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">head /tmp/repo/.git/FETCH_HEAD
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7		branch 'master' of https://github.com/git/git
+3b9e3c2cede15057af3ff8076c45ad5f33829436	not-for-merge	branch 'maint' of https://github.com/git/git
+67fe103aa68d54c3706f4a9cdf52c50f21979829	not-for-merge	branch 'next' of https://github.com/git/git
+512253265c9c9d014d29165f4c421e6304266292	not-for-merge	branch 'pu' of https://github.com/git/git
+22216bdf6ae7a2709b577b361e5d58dc97270f38	not-for-merge	branch 'todo' of https://github.com/git/git
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org8969c7d" class="outline-2">
+<h2 id="org8969c7d"><span class="section-number-2">8</span> Git log</h2>
+<div class="outline-text-2" id="text-8">
+<ul class="org-ul">
+<li>This is the workhorse of mining git</li>
+<li>You can extract <b>almost</b> everything with it</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #0000FF;">exec</span> 2&gt;&amp;1
+git  log  --help  | head -20
+:
+</pre>
+</div>
+
+<pre class="example">
+GIT-LOG(1)                        Git Manual                        GIT-LOG(1)
+
+NAME
+       git-log - Show commit logs
+
+SYNOPSIS
+       git log [&lt;options&gt;] [&lt;revision range&gt;] [[--] &lt;path&gt;...]
+
+DESCRIPTION
+       Shows the commit logs.
+
+       The command takes options applicable to the git rev-list command to
+       control what is shown and how, and options applicable to the git diff-*
+       commands to control how the changes each commit introduces are shown.
+
+OPTIONS
+       --follow
+           Continue listing the history of a file beyond renames (works only
+           for a single file).
+</pre>
+</div>
+
+<div id="outline-container-orgf1bb371" class="outline-3">
+<h3 id="orgf1bb371"><span class="section-number-3">8.1</span> Default output</h3>
+<div class="outline-text-3" id="text-8-1">
+<div class="org-src-container">
+<pre class="src src-sh">git -C  /tmp/repo log -2
+</pre>
+</div>
+
+<pre class="example">
+commit e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7
+Author: Junio C Hamano &lt;gitster@pobox.com&gt;
+Date:   Fri Feb 24 10:49:58 2017 -0800
+
+    Git 2.12
+    
+    Signed-off-by: Junio C Hamano &lt;gitster@pobox.com&gt;
+
+commit cca4f20edad04decdc268102f9a6ee2e3803bcc7
+Merge: dc9ded4 7e82388
+Author: Junio C Hamano &lt;gitster@pobox.com&gt;
+Date:   Fri Feb 24 10:48:10 2017 -0800
+
+    Merge branch 'ps/doc-gc-aggressive-depth-update'
+    
+    Doc update.
+    
+    * ps/doc-gc-aggressive-depth-update:
+      docs/git-gc: fix default value for `--aggressiveDepth`
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org2c67296" class="outline-3">
+<h3 id="org2c67296"><span class="section-number-3">8.2</span> Some important git log options: oneline</h3>
+<div class="outline-text-3" id="text-8-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#x2013;oneline</td>
+<td class="org-left">one commit per line.</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C  /tmp/repo log --oneline -5
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5 Git 2.12
+cca4f20 Merge branch 'ps/doc-gc-aggressive-depth-update'
+dc9ded4 Merge branch 'bc/worktree-doc-fix-detached'
+c6788b1 Merge branch 'dr/doc-check-ref-format-normalize'
+eccf97c Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgc59d871" class="outline-3">
+<h3 id="orgc59d871"><span class="section-number-3">8.3</span> Some important git log options: no-abbrev</h3>
+<div class="outline-text-3" id="text-8-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#x2013;no-abbbrev</td>
+<td class="org-left">Force git to always give you full commit ids</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C  /tmp/repo log -1 --oneline --no-abbrev -5
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7 Git 2.12
+cca4f20edad04decdc268102f9a6ee2e3803bcc7 Merge branch 'ps/doc-gc-aggressive-depth-update'
+dc9ded480245c1014b526c4b951d1acb3a60d3fa Merge branch 'bc/worktree-doc-fix-detached'
+c6788b1f45c6da1139570430b998028e3d2af590 Merge branch 'dr/doc-check-ref-format-normalize'
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org2616209" class="outline-2">
+<h2 id="org2616209"><span class="section-number-2">9</span> Git log can be parsed with a very simple finite state machine</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+This program will:
+</p>
+
+<ul class="org-ul">
+<li>replace any semicolon in the input with &lt;SEMICOLON&gt;</li>
+<li>every input line is converted to a "record": 
+<ul class="org-ul">
+<li>separator ";"</li>
+<li>first field: commitid</li>
+<li>second field: name of header field, empty for body</li>
+<li>third field: contents of field</li>
+</ul></li>
+<li>a line starting with "commit &lt;cid&gt; " or "&lt;cid&gt; " will be considered a new commit</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-perl" id="orgb2bfb01"><span style="color: #8D8D84;">#</span><span style="color: #8D8D84; font-style: italic;">!/usr/bin/perl</span>
+
+<span style="color: #0000FF;">my</span> <span style="color: #BA36A5;">$strict</span>;
+<span style="color: #0000FF;">my</span> <span style="color: #BA36A5;">$cid</span>;
+<span style="color: #0000FF;">while</span> (&lt;&gt;) {
+    <span style="color: #66cd00;">chomp</span>;
+    <span style="color: #66cd00;">s</span><span style="color: #D0372D;">/</span><span style="color: #008000;">;</span><span style="color: #D0372D;">/</span><span style="color: #008000;">&lt;SEMICOLON&gt;</span><span style="color: #D0372D;">/</span><span style="color: #66cd00;">g</span>;
+<span style="text-decoration: underline;">    </span>
+    <span style="color: #0000FF;">if</span> (<span style="color: #D0372D;">/</span><span style="color: #006699;">^</span><span style="color: #008000;">commit </span><span style="color: #0000FF;">(</span><span style="color: #006699;">[</span><span style="color: #008000;">0</span><span style="color: #006699;">-</span><span style="color: #008000;">9a</span><span style="color: #006699;">-</span><span style="color: #008000;">f</span><span style="color: #006699;">]</span><span style="color: #006FE0;">{</span><span style="color: #008000;">40</span><span style="color: #006FE0;">}</span><span style="color: #0000FF;">)</span><span style="color: #008000;"> </span><span style="color: #006FE0;">*</span><span style="color: #0000FF;">(</span><span style="color: #006699;">.</span><span style="color: #006FE0;">*</span><span style="color: #0000FF;">)</span><span style="color: #006699;">$</span><span style="color: #D0372D;">/</span>) {<span style="text-decoration: underline;"> </span>
+        <span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">match commit id</span>
+        $cid = $1;<span style="text-decoration: underline;"> </span>
+        <span style="color: #66cd00;">print</span> <span style="color: #008000;">"$1;$2\n"</span>;
+    } <span style="color: #0000FF;">elsif</span> (<span style="color: #D0372D;">/</span><span style="color: #006699;">^</span><span style="color: #0000FF;">(</span><span style="color: #006699;">[</span><span style="color: #008000;">0</span><span style="color: #006699;">-</span><span style="color: #008000;">9a</span><span style="color: #006699;">-</span><span style="color: #008000;">f</span><span style="color: #006699;">]</span><span style="color: #006FE0;">{</span><span style="color: #008000;">40</span><span style="color: #006FE0;">}</span><span style="color: #0000FF;">)</span><span style="color: #008000;"> </span><span style="color: #006FE0;">*</span><span style="color: #0000FF;">(</span><span style="color: #006699;">.</span><span style="color: #006FE0;">*</span><span style="color: #0000FF;">)</span><span style="color: #006699;">$</span><span style="color: #D0372D;">/</span>) {
+        <span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">--abbrev does not include commit</span>
+        $cid = $1;<span style="text-decoration: underline;"> </span>
+        <span style="color: #66cd00;">print</span> <span style="color: #008000;">"$1;$2\n"</span>;
+    } <span style="color: #0000FF;">else</span> {
+        <span style="color: #0000FF;">if</span> (<span style="color: #D0372D;">/</span><span style="color: #006699;">^</span><span style="color: #0000FF;">(</span><span style="color: #006FE0;">\</span><span style="color: #6434A3;">S</span><span style="color: #006FE0;">+</span><span style="color: #0000FF;">)</span><span style="color: #008000;">:</span><span style="color: #006FE0;">\</span><span style="color: #6434A3;">s</span><span style="color: #006FE0;">+</span><span style="color: #0000FF;">(</span><span style="color: #006699;">.</span><span style="color: #006FE0;">*</span><span style="color: #0000FF;">)</span><span style="color: #006699;">$</span><span style="color: #D0372D;">/</span>) {
+           <span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">if it has a non-space sequence followed by :</span>
+           <span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">then it is a header field. split</span>
+            <span style="color: #66cd00;">print</span> <span style="color: #008000;">"$cid;$1;$2\n"</span>;
+        } <span style="color: #0000FF;">else</span> {
+            <span style="color: #66cd00;">print</span> <span style="color: #008000;">"$cid;;$_\n"</span>;
+        }
+    }
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/repo log -2  | perl withCid.pl
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Date;Fri Feb 24 10:49:58 2017 -0800
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    Git 2.12
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    Signed-off-by: Junio C Hamano &lt;gitster@pobox.com&gt;
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Merge;dc9ded4 7e82388
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Date;Fri Feb 24 10:48:10 2017 -0800
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    Merge branch 'ps/doc-gc-aggressive-depth-update'
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    Doc update.
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    * ps/doc-gc-aggressive-depth-update:
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;      docs/git-gc: fix default value for `--aggressiveDepth`
+</pre>
+
+
+<p>
+So now  we can extract any information we want:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/repo log -6  | perl withCid.pl | grep <span style="color: #008000;">';Author;'</span>
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+dc9ded480245c1014b526c4b951d1acb3a60d3fa;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+c6788b1f45c6da1139570430b998028e3d2af590;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+c0588fd61aa6da96824eec60719c505b66239dd6;Author;Junio C Hamano &lt;gitster@pobox.com&gt;
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgb7f2e35" class="outline-2">
+<h2 id="orgb7f2e35"><span class="section-number-2">10</span> But git log is already capable of doing this: format</h2>
+<div class="outline-text-2" id="text-10">
+<div class="org-src-container">
+<pre class="src src-sh">man git-log  | egrep -A 20 <span style="color: #008000;">'format:&lt;string&gt;$'</span>
+</pre>
+</div>
+
+<pre class="example">
+·   format:&lt;string&gt;
+
+    The format:&lt;string&gt; format allows you to specify which information
+    you want to show. It works a little bit like printf format, with
+    the notable exception that you get a newline with %n instead of \n.
+
+    E.g, format:"The author of %h was %an, %ar%nThe title was &gt;&gt;%s&lt;&lt;%n"
+    would show something like this:
+
+        The author of fe6e0ee was Junio C Hamano, 23 hours ago
+        The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;
+
+    The placeholders are:
+
+    ·   %H: commit hash
+
+    ·   %h: abbreviated commit hash
+
+    ·   %T: tree hash
+
+    ·   %t: abbreviated tree hash
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org3b6673c" class="outline-2">
+<h2 id="org3b6673c"><span class="section-number-2">11</span> git log format: most useful options</h2>
+<div class="outline-text-2" id="text-11">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">%H</td>
+<td class="org-left">commit hash</td>
+</tr>
+
+<tr>
+<td class="org-left">%P</td>
+<td class="org-left">parent hashes</td>
+</tr>
+
+<tr>
+<td class="org-left">%an</td>
+<td class="org-left">author name</td>
+</tr>
+
+<tr>
+<td class="org-left">%ae</td>
+<td class="org-left">author email</td>
+</tr>
+
+<tr>
+<td class="org-left">%ad</td>
+<td class="org-left">author date (format respects &#x2013;date= option)</td>
+</tr>
+
+<tr>
+<td class="org-left">%aD</td>
+<td class="org-left">author date, RFC2822 style</td>
+</tr>
+
+<tr>
+<td class="org-left">%cn</td>
+<td class="org-left">committer name</td>
+</tr>
+
+<tr>
+<td class="org-left">%ce</td>
+<td class="org-left">committer email</td>
+</tr>
+
+<tr>
+<td class="org-left">%cd</td>
+<td class="org-left">committer date (format respects &#x2013;date= option)</td>
+</tr>
+
+<tr>
+<td class="org-left">%cD</td>
+<td class="org-left">committer date, RFC2822 style</td>
+</tr>
+
+<tr>
+<td class="org-left">%s</td>
+<td class="org-left">subject</td>
+</tr>
+
+<tr>
+<td class="org-left">%f</td>
+<td class="org-left">sanitized subject line, suitable for a filename</td>
+</tr>
+
+<tr>
+<td class="org-left">%b</td>
+<td class="org-left">body</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-orgf5b8de6" class="outline-2">
+<h2 id="orgf5b8de6"><span class="section-number-2">12</span> git log format&#x2026;</h2>
+<div class="outline-text-2" id="text-12">
+<p>
+or you can learn how to do it via the format option:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/repo log -6  --format=<span style="color: #008000;">'%H;%an;%ae'</span>
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Junio C Hamano;gitster@pobox.com
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Junio C Hamano;gitster@pobox.com
+dc9ded480245c1014b526c4b951d1acb3a60d3fa;Junio C Hamano;gitster@pobox.com
+c6788b1f45c6da1139570430b998028e3d2af590;Junio C Hamano;gitster@pobox.com
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Junio C Hamano;gitster@pobox.com
+c0588fd61aa6da96824eec60719c505b66239dd6;Junio C Hamano;gitster@pobox.com
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/repo log -6  --format=<span style="color: #008000;">'%H;Commiter;%cn; CommiterDate;%ct'</span>
+</pre>
+</div>
+
+<pre class="example">
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Commiter;Junio C Hamano; CommiterDate;1487962198
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;Commiter;Junio C Hamano; CommiterDate;1487962090
+dc9ded480245c1014b526c4b951d1acb3a60d3fa;Commiter;Junio C Hamano; CommiterDate;1487962090
+c6788b1f45c6da1139570430b998028e3d2af590;Commiter;Junio C Hamano; CommiterDate;1487962089
+eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Commiter;Junio C Hamano; CommiterDate;1487962089
+c0588fd61aa6da96824eec60719c505b66239dd6;Commiter;Junio C Hamano; CommiterDate;1487962088
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org04568c7" class="outline-2">
+<h2 id="org04568c7"><span class="section-number-2">13</span> You can easily import info into a database</h2>
+<div class="outline-text-2" id="text-13">
+<p>
+<b>Warning</b>. you have to be careful about using separators that might appear in the fields. It is safer to use your own
+filter (see my example above). that way  you can make sure the separator is never part of a field. Or
+hack it as I have done it below. You could restore the semicolons once data is in the database.
+</p>
+
+<p>
+In this example I am going to import:
+</p>
+<ul class="org-ul">
+<li>cid, author, authoremail, authortime, committer, comitteremail, commitdate and summary</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/repo log  --format=<span style="color: #008000;">'%H&lt;SEMI&gt;%an&lt;SEMI&gt;%ae&lt;SEMI&gt;%at&lt;SEMI&gt;%cn&lt;SEMI&gt;%ce&lt;SEMI&gt;%ct&lt;SEMI&gt;%s'</span> &gt; /tmp/rip.rip
+<span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">replace semicolons with a marker so we can import it</span>
+perl -pe <span style="color: #008000;">'s/;/&lt;SEMICOLON&gt;/g;'</span> /tmp/rip.rip &gt; /tmp/rip.rip2
+<span style="color: #8D8D84;"># </span><span style="color: #8D8D84; font-style: italic;">replace &lt;SEMI&gt; with the ; delimiter (I like ;)</span>
+perl -pe <span style="color: #008000;">'s/&lt;SEMI&gt;/;/g'</span> /tmp/rip.rip2 &gt; /tmp/rip.rip3
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sqlite"><span style="color: #0000FF;">drop</span> <span style="color: #0000FF;">table</span> <span style="color: #006699;">if</span> <span style="color: #0000FF;">exists</span> commits;
+<span style="color: #0000FF;">create</span> <span style="color: #0000FF;">table</span> <span style="color: #006699;">commits</span>(cid <span style="color: #6434A3;">varchar</span>, author <span style="color: #6434A3;">varchar</span>, authoremail <span style="color: #6434A3;">varchar</span>, authortime <span style="color: #6434A3;">int</span>, 
+                     committer <span style="color: #6434A3;">varchar</span>, commiteremail <span style="color: #6434A3;">varchar</span>, commitdate <span style="color: #6434A3;">int</span>, summary <span style="color: #6434A3;">varchar</span>);
+.mode csv commits
+.separator ;
+.import "/tmp/rip.rip3" commits
+<span style="color: #0000FF;">select</span> <span style="color: #006FE0;">count</span>(*) <span style="color: #0000FF;">from</span> commits;
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">count(*)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">43937</td>
+</tr>
+</tbody>
+</table>
+
+<div class="org-src-container">
+<pre class="src src-sqlite"><span style="color: #0000FF;">select</span> * <span style="color: #0000FF;">from</span> commits <span style="color: #0000FF;">limit</span> 10;
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">cid</th>
+<th scope="col" class="org-left">author</th>
+<th scope="col" class="org-left">authoremail</th>
+<th scope="col" class="org-right">authortime</th>
+<th scope="col" class="org-left">committer</th>
+<th scope="col" class="org-left">commiteremail</th>
+<th scope="col" class="org-right">commitdate</th>
+<th scope="col" class="org-left">summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962198</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962198</td>
+<td class="org-left">Git 2.12</td>
+</tr>
+
+<tr>
+<td class="org-left">cca4f20edad04decdc268102f9a6ee2e3803bcc7</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962090</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962090</td>
+<td class="org-left">Merge branch 'ps/doc-gc-aggressive-depth-update'</td>
+</tr>
+
+<tr>
+<td class="org-left">dc9ded480245c1014b526c4b951d1acb3a60d3fa</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962090</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962090</td>
+<td class="org-left">Merge branch 'bc/worktree-doc-fix-detached'</td>
+</tr>
+
+<tr>
+<td class="org-left">c6788b1f45c6da1139570430b998028e3d2af590</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962089</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962089</td>
+<td class="org-left">Merge branch 'dr/doc-check-ref-format-normalize'</td>
+</tr>
+
+<tr>
+<td class="org-left">eccf97c386ea970cc1fa6e6387f4786d05ecd76e</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962089</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962089</td>
+<td class="org-left">Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'</td>
+</tr>
+
+<tr>
+<td class="org-left">c0588fd61aa6da96824eec60719c505b66239dd6</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962088</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962088</td>
+<td class="org-left">Merge branch 'rt/align-add-i-help-text'</td>
+</tr>
+
+<tr>
+<td class="org-left">af4027f2decece569e7a565e592ca69677c27996</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962087</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487962088</td>
+<td class="org-left">Merge branch 'bc/blame-doc-fix'</td>
+</tr>
+
+<tr>
+<td class="org-left">7e82388024504be733ba23c97f884148870fe9cc</td>
+<td class="org-left">Patrick Steinhardt</td>
+<td class="org-left">ps@pks.im</td>
+<td class="org-right">1487926005</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487959152</td>
+<td class="org-left">docs/git-gc: fix default value for `&#x2013;aggressiveDepth`</td>
+</tr>
+
+<tr>
+<td class="org-left">cc24d7d21f4fe034b9559dcfd669d9639b9d52a4</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487958941</td>
+<td class="org-left">Junio C Hamano</td>
+<td class="org-left">gitster@pobox.com</td>
+<td class="org-right">1487958941</td>
+<td class="org-left">Merge tag 'l10n-2.12.0-rnd2' of git://github.com/git-l10n/git-po</td>
+</tr>
+
+<tr>
+<td class="org-left">1a79b2f1795a6ec4c70674ce930843aa59bff859</td>
+<td class="org-left">Jiang Xin</td>
+<td class="org-left">worldhello.net@gmail.com</td>
+<td class="org-right">1485528657</td>
+<td class="org-left">Jiang Xin</td>
+<td class="org-left">worldhello.net@gmail.com</td>
+<td class="org-right">1487953154</td>
+<td class="org-left">l10n: zh_CN: for git v2.12.0 l10n round 2</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<div class="org-src-container">
+<pre class="src src-sqlite"><span style="color: #0000FF;">select</span> cid, summary <span style="color: #0000FF;">from</span> commits <span style="color: #0000FF;">limit</span> 4;
+</pre>
+</div>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">cid</th>
+<th scope="col" class="org-left">summary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7</td>
+<td class="org-left">Git 2.12</td>
+</tr>
+
+<tr>
+<td class="org-left">cca4f20edad04decdc268102f9a6ee2e3803bcc7</td>
+<td class="org-left">Merge branch 'ps/doc-gc-aggressive-depth-update'</td>
+</tr>
+
+<tr>
+<td class="org-left">dc9ded480245c1014b526c4b951d1acb3a60d3fa</td>
+<td class="org-left">Merge branch 'bc/worktree-doc-fix-detached'</td>
+</tr>
+
+<tr>
+<td class="org-left">c6788b1f45c6da1139570430b998028e3d2af590</td>
+<td class="org-left">Merge branch 'dr/doc-check-ref-format-normalize'</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div id="outline-container-orgfb20fd3" class="outline-2">
+<h2 id="orgfb20fd3"><span class="section-number-2">14</span> Branches</h2>
+<div class="outline-text-2" id="text-14">
+<p>
+When cloning, you get all commits in the repo, but not all the branch info
+</p>
+
+<p>
+See <a href="http://github.com/dmgerman/xournal">http://github.com/dmgerman/xournal</a>
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-sh"><span style="color: #006FE0;">cd</span> /tmp/
+git clone http://github.com/dmgerman/xournal
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal branch --all
+</pre>
+</div>
+
+<pre class="example">
+\* master
+  remotes/origin/HEAD -&gt; origin/master
+  remotes/origin/bookmarks
+  remotes/origin/cl-options
+  remotes/origin/cmake
+  remotes/origin/dmgwin
+  remotes/origin/dot-paper-style
+  remotes/origin/fix-update-width
+  remotes/origin/glade
+  remotes/origin/gtk3
+  remotes/origin/horizontal-scroll-lock
+  remotes/origin/layers
+  remotes/origin/master
+  remotes/origin/message
+  remotes/origin/mru
+  remotes/origin/next
+  remotes/origin/popupmenu
+  remotes/origin/quick-zoom
+  remotes/origin/redo
+  remotes/origin/snap-to-grid
+  remotes/origin/upstream
+</pre>
+
+<p>
+Use fetch &#x2013;all to create a nice file that has all this info
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal fetch --all
+</pre>
+</div>
+
+
+<p>
+Then you have a file: .git/FETCH_HEAD that contains all information of branches
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">cat /tmp/xournal/.git/FETCH_HEAD  | head -5
+</pre>
+</div>
+
+<pre class="example">
+015aa5dfb1b612c208192cfb9692d1eb6b8fd297		branch 'master' of http://github.com/dmgerman/xournal
+b3f07476632ed5b742af3506cb7cd4272956d339	not-for-merge	branch 'bookmarks' of http://github.com/dmgerman/xournal
+ad1febce77ed17987dda1bca940fc3e555e6b503	not-for-merge	branch 'cl-options' of http://github.com/dmgerman/xournal
+59cb4a16aba5042b3b552c4a7f3187196b99d953	not-for-merge	branch 'cmake' of http://github.com/dmgerman/xournal
+3b3cb888333d165fe2dd05dfd10560f40ca7befa	not-for-merge	branch 'dmgwin' of http://github.com/dmgerman/xournal
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgfab1dbe" class="outline-2">
+<h2 id="orgfab1dbe"><span class="section-number-2">15</span> Commits in Branches</h2>
+<div class="outline-text-2" id="text-15">
+<p>
+By default, git log gives you the log of the "current" branch
+</p>
+
+<ul class="org-ul">
+<li>From the current commit backwards to the roots of the repo</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal checkout master
+git -C /tmp/xournal branch
+git -C /tmp/xournal log  -1
+git -C /tmp/xournal checkout remotes/origin/next
+git -C /tmp/xournal branch
+git -C /tmp/xournal log -1
+</pre>
+</div>
+
+<pre class="example">
+git -C /tmp/xournal checkout master
+Switched to branch 'master'
+Your branch is up-to-date with 'origin/master'.
+
+git -C /tmp/xournal branch
+*master
+
+git -C /tmp/xournal log  -1
+commit 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Wed Aug 17 10:03:35 2016 -0700
+
+    Add .gitignore
+git -C /tmp/xournal checkout remotes/origin/next
+Note: checking out 'remotes/origin/next'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b &lt;new-branch-name&gt;
+
+HEAD is now at 031f268... merged kinetic scroll by Immi
+git -C /tmp/xournal branch
+*(HEAD detached at origin/next)
+  master
+git -C /tmp/xournal log  -1
+commit 031f268cf4ee67bb2e26bfe0a842fa48352b6d24
+Merge: b8712f4 ef22a43
+Author: D German &lt;dmg@uvic.ca&gt;
+Date:   Sun Sep 11 22:16:02 2016 -0700
+
+    merged kinetic scroll by Immi
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org6cf60b3" class="outline-2">
+<h2 id="org6cf60b3"><span class="section-number-2">16</span> Commits in Branches&#x2026;</h2>
+<div class="outline-text-2" id="text-16">
+<p>
+if you want all commits, then use glob='*'
+</p>
+
+<ul class="org-ul">
+<li>includes all branches
+<ul class="org-ul">
+<li>even "detached branches"</li>
+</ul></li>
+<li>irrespective to current commit</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal checkout master
+git -C /tmp/xournal branch
+git -C /tmp/xournal log  --oneline | wc -l
+git -C /tmp/xournal log  --oneline --glob=<span style="color: #008000;">'*'</span> | wc -l
+git -C /tmp/xournal checkout remotes/origin/next
+git -C /tmp/xournal branch
+git -C /tmp/xournal log  --oneline | wc -l
+git -C /tmp/xournal log  --oneline --glob=<span style="color: #008000;">'*'</span>| wc -l
+</pre>
+</div>
+
+<pre class="example">
+Already on 'master'
+Your branch is up-to-date with 'origin/master'.
+*master
+171
+352
+Note: checking out 'remotes/origin/next'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by performing another checkout.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -b with the checkout command again. Example:
+
+  git checkout -b &lt;new-branch-name&gt;
+
+HEAD is now at 031f268... merged kinetic scroll by Immi
+*(HEAD detached at origin/next)
+  master
+231
+352
+</pre>
+</div>
+</div>
+
+
+
+<div id="outline-container-orgb4f8559" class="outline-2">
+<h2 id="orgb4f8559"><span class="section-number-2">17</span> Parents</h2>
+<div class="outline-text-2" id="text-17">
+<p>
+The DAG is the fundamental data structure of git
+</p>
+
+<ul class="org-ul">
+<li>Every commit has zero or more parents</li>
+<li>Current heads of branches (including master) might have zero children
+<ul class="org-ul">
+<li>At least one branch will always have zero children</li>
+<li>A branch head with children means it has been merged</li>
+</ul></li>
+<li>Roots of the branches have zero parents</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal log --pretty=<span style="color: #008000;">'%H;%P'</span> -n 5 origin/next
+</pre>
+</div>
+
+
+<pre class="example">
+c08da1d700a818cada297aee949b40da780b536e;661075ab91e296fb5b702be379967bd581290942 03b7651644aea0a95fd09f1566d4a667df8d7950
+03b7651644aea0a95fd09f1566d4a667df8d7950;addb9bf2c0be2ff61e72d3c565253d319311d2f8
+661075ab91e296fb5b702be379967bd581290942;ae37e72839ae59308974b9375eae0c8630c4795c addb9bf2c0be2ff61e72d3c565253d319311d2f8
+ae37e72839ae59308974b9375eae0c8630c4795c;a40e13ec95dc9b8fbc1578ec5be8cbce6e7c839c f28489f7f7477e59a9015e17a795c88ab89d977d
+addb9bf2c0be2ff61e72d3c565253d319311d2f8;f28489f7f7477e59a9015e17a795c88ab89d977d
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org0c97a8a" class="outline-2">
+<h2 id="org0c97a8a"><span class="section-number-2">18</span> Parents&#x2026;</h2>
+<div class="outline-text-2" id="text-18">
+<ul class="org-ul">
+<li><p>
+Merges with more than 2 parents are called <i>octupus</i> merge
+</p>
+<ul class="org-ul">
+<li>From Linus, regarding an octupus merge in the Kernel (Jan 2014).</li>
+</ul>
+<pre class="example">
+Christ. When you start doing octopus merges, you don't do it by half
+measures, do you?
+
+I just pulled the sound updates from Takashi, and as a result got your
+merge commit 2cde51fbd0f3. That one has 66 parents.
+
+That kind of merge either needs to be split up, or gitk needs to be
+made better about visualizing it, because it ends up being *so* wide
+that the history is hard to read.
+</pre></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org63ba25d" class="outline-2">
+<h2 id="org63ba25d"><span class="section-number-2">19</span> Parents&#x2026;</h2>
+<div class="outline-text-2" id="text-19">
+<ul class="org-ul">
+<li>Parents are ordered
+<ul class="org-ul">
+<li>First parent determines the branch in which the merge was applied</li>
+<li>Merging strategy determines how to resolve merges (an option of git merge)</li>
+<li>If the merge has a patch associated with it, 
+<ul class="org-ul">
+<li>then there was a merge conflict and that patch is the manual fix</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgce08467" class="outline-2">
+<h2 id="orgce08467"><span class="section-number-2">20</span> Roots:</h2>
+<div class="outline-text-2" id="text-20">
+<ul class="org-ul">
+<li>there might be more than one root (linux has 4, git has more)</li>
+<li>commits without parents</li>
+</ul>
+</div>
+
+<div id="outline-container-org6201617" class="outline-3">
+<h3 id="org6201617"><span class="section-number-3">20.1</span> Merges</h3>
+<div class="outline-text-3" id="text-20-1">
+<ul class="org-ul">
+<li>You can ask for only merges</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal log --merges -5 --glob=<span style="color: #008000;">'*'</span> --pretty=<span style="color: #008000;">'%H %P'</span>
+</pre>
+</div>
+
+<pre class="example">
+031f268cf4ee67bb2e26bfe0a842fa48352b6d24 b8712f4ba54ed72e4b2b2a3829620cfa86740d9c ef22a4356ac80742242aff8906eec646b8692071
+5a47ec2006f731234f4aeb59c45ad88b051dc91a 6bb4780799f7480eaebf1737a851739595db599c 356bed06c8b3370ac74d9c7c8c316b9c56cdeebe
+0b2aee20e9d102235e006a0a11581e4914111de2 84b90eae4bbbe63d073d321ca1a594042e690c69 f503bba9ff65b45ead76ffa6372f050a90bd4b06
+84b90eae4bbbe63d073d321ca1a594042e690c69 c08da1d700a818cada297aee949b40da780b536e 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
+c08da1d700a818cada297aee949b40da780b536e 661075ab91e296fb5b702be379967bd581290942 03b7651644aea0a95fd09f1566d4a667df8d7950
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgfce243c" class="outline-2">
+<h2 id="orgfce243c"><span class="section-number-2">21</span> Files modified</h2>
+<div class="outline-text-2" id="text-21">
+<ul class="org-ul">
+<li>Several ways to extract it:</li>
+</ul>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#x2013;numstat</td>
+</tr>
+
+<tr>
+<td class="org-left">&#x2013;stat</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div id="outline-container-org5b5a7a0" class="outline-3">
+<h3 id="org5b5a7a0"><span class="section-number-3">21.1</span> &#x2013;numstat</h3>
+<div class="outline-text-3" id="text-21-1">
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/xournal log -2 --numstat
+</pre>
+</div>
+
+<pre class="example">
+commit 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Wed Aug 17 10:03:35 2016 -0700
+
+    Add .gitignore
+
+24	0	.gitignore
+
+commit 565e4cb0c1e59fe19c7520c3171e21beb948a143
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Fri Jul 15 23:24:12 2016 +0200
+
+    fix crash when pasting text or images via xclip (bug #171)
+
+1	0	ChangeLog
+1	2	src/xo-clipboard.c
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org21ddadb" class="outline-3">
+<h3 id="org21ddadb"><span class="section-number-3">21.2</span> &#x2013;stat</h3>
+<div class="outline-text-3" id="text-21-2">
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/xournal log -2 --stat
+</pre>
+</div>
+
+<pre class="example">
+commit 015aa5dfb1b612c208192cfb9692d1eb6b8fd297
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Wed Aug 17 10:03:35 2016 -0700
+
+    Add .gitignore
+
+ .gitignore | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+commit 565e4cb0c1e59fe19c7520c3171e21beb948a143
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Fri Jul 15 23:24:12 2016 +0200
+
+    fix crash when pasting text or images via xclip (bug #171)
+
+ ChangeLog          | 1 +
+ src/xo-clipboard.c | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgf9c591a" class="outline-3">
+<h3 id="orgf9c591a"><span class="section-number-3">21.3</span> How they deal with added files:</h3>
+<div class="outline-text-3" id="text-21-3">
+<p>
+None of them identify files added or removed
+</p>
+
+<ul class="org-ul">
+<li>in this commit, the file po/ja.po was added</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">printf <span style="color: #008000;">"With --stat\n\n"</span>
+git  -C /tmp/xournal log -1  --stat  8e7af75f1c297a0144fce9db84450d4b9fff7090
+printf <span style="color: #008000;">"\nWith --numstat\n\n"</span>
+git  -C /tmp/xournal log -1  --numstat  8e7af75f1c297a0144fce9db84450d4b9fff7090
+</pre>
+</div>
+
+<pre class="example">
+With --stat
+
+commit 8e7af75f1c297a0144fce9db84450d4b9fff7090
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Fri Nov 22 10:52:32 2013 -0800
+
+    Add Japanese translation (by Hiroshi Saito)
+
+ AUTHORS           |    4 +-
+ ChangeLog         |    1 +
+ po/ChangeLog      |    1 +
+ po/LINGUAS        |    1 +
+ po/Makefile.in.in |  280 ------------
+ po/ja.po          | 1277 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 1282 insertions(+), 282 deletions(-)
+
+With --numstat
+
+commit 8e7af75f1c297a0144fce9db84450d4b9fff7090
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Fri Nov 22 10:52:32 2013 -0800
+
+    Add Japanese translation (by Hiroshi Saito)
+
+2	2	AUTHORS
+1	0	ChangeLog
+1	0	po/ChangeLog
+1	0	po/LINGUAS
+0	280	po/Makefile.in.in
+1277	0	po/ja.po
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgb38a6de" class="outline-3">
+<h3 id="orgb38a6de"><span class="section-number-3">21.4</span> issues with &#x2013;numstat or &#x2013;stat</h3>
+<div class="outline-text-3" id="text-21-4">
+<p>
+Several issues:
+</p>
+
+<ul class="org-ul">
+<li>git log does not indicate if the file is added or removed</li>
+<li>it does not output numbers of added/deleted for binary files (only - -)</li>
+<li>Time consuming: it requires computing a diff
+<ul class="org-ul">
+<li><p>
+A simple test: git log -100000 (log of 10k commits) of the linux kernel
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">&#x2013;numstat</td>
+<td class="org-left">66 seconds</td>
+</tr>
+
+<tr>
+<td class="org-left">&#x2013;stat</td>
+<td class="org-left">66 seconds</td>
+</tr>
+
+<tr>
+<td class="org-left">&#x2013;raw</td>
+<td class="org-left">10 seconds</td>
+</tr>
+</tbody>
+</table></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org0a0fe1c" class="outline-3">
+<h3 id="org0a0fe1c"><span class="section-number-3">21.5</span> Better solution: &#x2013;raw</h3>
+<div class="outline-text-3" id="text-21-5">
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/xournal log -1 --no-abbrev --raw  8e7af75f1c297a0144fce9db84450d4b9fff7090
+</pre>
+</div>
+
+<pre class="example">
+commit 8e7af75f1c297a0144fce9db84450d4b9fff7090
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Fri Nov 22 10:52:32 2013 -0800
+
+    Add Japanese translation (by Hiroshi Saito)
+
+:100644 100644 b06824a1794b3fc57e6f20daf5d08d7a1676cabd a75eb8323c5e436b1575e298d15c2fb55d239989 M	AUTHORS
+:100644 100644 9e94a076aa0d43fd1fb2334b841d26c697bf78f3 4362844c11e55d54b05475878ed094e1654dabdf M	ChangeLog
+:100644 100644 e4842ac28c06f8ecc1c890d8a40274bd2748bcb9 4183b0780214178c84aa17583a45a47c5e7bd050 M	po/ChangeLog
+:100644 100644 5f08a210539c0397bbfe46d4e98fdbe9b07c60b4 9c24ed16b02d55023e7eeba7323d31280f559ceb M	po/LINGUAS
+:100644 000000 53b496dc6896de97115014f78ade708b766a6fc1 0000000000000000000000000000000000000000 D	po/Makefile.in.in
+:000000 100644 0000000000000000000000000000000000000000 9fcb55aed95a2c5c5a01c0b6e1d2a145bd21d9cd A	po/ja.po
+</pre>
+
+<p>
+Fields:
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">File mode before</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">File mode after</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">blob before</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">blob after</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+
+<tr>
+<td class="org-left">operation</td>
+<td class="org-left">M modified, D deleted, R rename, A added</td>
+</tr>
+
+<tr>
+<td class="org-left">filename</td>
+<td class="org-left">&#xa0;</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+For merges, it contains n+1 info:
+</p>
+
+<ul class="org-ul">
+<li>File info before in each branch</li>
+<li>File info after merge</li>
+</ul>
+
+<p>
+but only when the merge included a patch
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgd2a3a17" class="outline-3">
+<h3 id="orgd2a3a17"><span class="section-number-3">21.6</span> Files modiefied: &#x2013;name-status</h3>
+<div class="outline-text-3" id="text-21-6">
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/xournal log --oneline --no-abbrev -1 --name-status 8e7af75f1c297a0144fce9db84450d4b9fff7090
+</pre>
+</div>
+
+<pre class="example">
+8e7af75f1c297a0144fce9db84450d4b9fff7090 Add Japanese translation (by Hiroshi Saito)
+M	AUTHORS
+M	ChangeLog
+M	po/ChangeLog
+M	po/LINGUAS
+D	po/Makefile.in.in
+A	po/ja.po
+</pre>
+
+<ul class="org-ul">
+<li>Subset info of &#x2013;raw</li>
+<li>Easier to parse</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org87620e1" class="outline-3">
+<h3 id="org87620e1"><span class="section-number-3">21.7</span> When to use</h3>
+<div class="outline-text-3" id="text-21-7">
+<ul class="org-ul">
+<li><b>&#x2013;numstat/&#x2013;stat</b>: When you need the "churn"</li>
+<li><b>&#x2013;raw</b>: when you need the files that were modified/added/removed</li>
+</ul>
+
+
+<p>
+You can now easily preprocess the data to load it into our database
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/xournal log --oneline --no-abbrev --name-status -10  | perl withCid.pl  | egrep $<span style="color: #008000;">';;'</span>  | perl -pe <span style="color: #008000;">'s/\t/;/;s/;;/;/;'</span>
+</pre>
+</div>
+
+<pre class="example">
+015aa5dfb1b612c208192cfb9692d1eb6b8fd297;A;.gitignore
+565e4cb0c1e59fe19c7520c3171e21beb948a143;M;ChangeLog
+565e4cb0c1e59fe19c7520c3171e21beb948a143;M;src/xo-clipboard.c
+50184f046f8dc80b145805aaec34ceb4a41781f6;M;ChangeLog
+50184f046f8dc80b145805aaec34ceb4a41781f6;M;src/xo-callbacks.c
+f15bc362de2c5401600c420395b765566c2152e1;M;ChangeLog
+f15bc362de2c5401600c420395b765566c2152e1;M;src/xo-file.c
+f15bc362de2c5401600c420395b765566c2152e1;M;src/xournal.h
+f28489f7f7477e59a9015e17a795c88ab89d977d;M;ChangeLog
+f28489f7f7477e59a9015e17a795c88ab89d977d;M;src/xo-callbacks.c
+f28489f7f7477e59a9015e17a795c88ab89d977d;M;src/xournal.h
+1b6ef5a24461b72bf2e98f1bfaad3567f0b9f542;M;src/xo-misc.c
+c10f6e8d0793a40bd6e19fad861194bd40b0ffec;M;src/main.c
+b885aab5d6c3e836c844d27ed6919ef4e1292c9c;M;src/main.c
+f5c777d4e081a886baed8bbe2aee4d84b3562722;M;src/xo-callbacks.c
+2b74a01bae6c282e12006579cf285e21c847472e;M;src/xo-file.c
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org85ea3fd" class="outline-2">
+<h2 id="org85ea3fd"><span class="section-number-2">22</span> Renames</h2>
+<div class="outline-text-2" id="text-22">
+<p>
+this file was renamed more than once (jruby)
+</p>
+
+<pre class="example">
+truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/jruby log --oneline --follow -10 -- truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
+</pre>
+</div>
+
+<pre class="example">
+745fccc [Truffle] File rename case error.
+7f591b6 [Truffle] Stop implementing POSIX.
+e2de847 [Truffle] getpid can be done in the POSIXHandler.
+4ae93d2 [Truffle] .posix package.
+f4d6315 [Truffle] Make it clear that Ruby is the JRuby runtime.
+a157011 [Truffle] Organise imports.
+30d975e [Truffle] Update copyright years - mostly moves but I'll run it anyway as Git will give the correct history if needs be.
+29c937f [Truffle] Exception package.
+587a1a6 [Truffle] Move a bunch of stuff out of runtime.
+85e3ab5 [Truffle] Move context and language to the top level.
+</pre>
+</div>
+
+<div id="outline-container-org20632fb" class="outline-3">
+<h3 id="org20632fb"><span class="section-number-3">22.1</span> How different commands report it</h3>
+<div class="outline-text-3" id="text-22-1">
+<p>
+Her is an example of how this rename is reported by different runs of git log on one of the commits that did the rename
+</p>
+
+<p>
+Using &#x2013;stat
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/jruby log --oneline --no-abbrev --stat 745fcccc684131c16159523c277de01737d764f0 -1
+</pre>
+</div>
+
+<pre class="example">
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+ .../platform/posix/{TrufflePOSIXHandler.java =&gt; TrufflePosixHandler.java} | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+</pre>
+
+<p>
+Using &#x2013;numstat
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/jruby log --oneline --no-abbrev --numstat 745fcccc684131c16159523c277de01737d764f0 -1
+</pre>
+</div>
+
+<pre class="example">
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+0	0	truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java =&gt; TrufflePosixHandler.java}
+</pre>
+
+<p>
+Using &#x2013;name-status
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/jruby log --oneline --no-abbrev --name-status 745fcccc684131c16159523c277de01737d764f0 -1
+</pre>
+</div>
+
+<pre class="example">
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+</pre>
+
+<p>
+Using &#x2013;summary
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/jruby log --oneline --no-abbrev --summary 745fcccc684131c16159523c277de01737d764f0 -1
+</pre>
+</div>
+
+<pre class="example">
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+ rename truffle/src/main/java/org/jruby/truffle/platform/posix/{TrufflePOSIXHandler.java =&gt; TrufflePosixHandler.java} (100%)
+</pre>
+
+<p>
+Using &#x2013;raw
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de01737d764f0 -1
+</pre>
+</div>
+
+<pre class="example">
+745fcccc684131c16159523c277de01737d764f0 [Truffle] File rename case error.
+:100644 100644 3b785cd8bfee363b17097a118673bc6d9d14185f 3b785cd8bfee363b17097a118673bc6d9d14185f R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePosixHandler.java
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgcb6d673" class="outline-3">
+<h3 id="orgcb6d673"><span class="section-number-3">22.2</span> Renames.. that R&#x2026;</h3>
+<div class="outline-text-3" id="text-22-2">
+<ul class="org-ul">
+<li>What is that number after the R? 
+<ul class="org-ul">
+<li>how similar the old and the new versions are</li>
+</ul></li>
+<li>when a file is deleted and another one is added, git computes a similarity metric</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/jruby log --name-status --oneline --no-abbrev | egrep <span style="color: #008000;">'^R'</span>  | head -5
+</pre>
+</div>
+
+<pre class="example">
+R100	spec/truffle/specs/truffle/digest.rb	spec/truffle/specs/truffle/digest_spec.rb
+R087	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java	truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+R081	truffle/src/main/java/org/jruby/truffle/parser/LazyTranslationNode.java	truffle/src/main/java/org/jruby/truffle/language/LazyRubyNode.java
+R088	truffle/src/main/java/org/jruby/truffle/language/RubySourceSection.java	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java
+R080	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRMetaClassBody.java	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRNoProtocolMethod.java
+</pre>
+
+<p>
+Let us add the commit id using our command withCid.pl:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/jruby log --name-status --oneline --no-abbrev | perl withCid.pl | grep <span style="color: #008000;">';;R'</span> | head -10
+</pre>
+</div>
+
+<pre class="example">
+4975495fe0459141f0df6306f522fe5673f61b03;;R100	spec/truffle/specs/truffle/digest.rb	spec/truffle/specs/truffle/digest_spec.rb
+62068e649dbd1f6d923de8cc52f2ff6fc0b65463;;R087	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java	truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+177282c270e14c4ec35821e7359f9aad62b84043;;R081	truffle/src/main/java/org/jruby/truffle/parser/LazyTranslationNode.java	truffle/src/main/java/org/jruby/truffle/language/LazyRubyNode.java
+b2df8ddc031a63779a4b91bfa63cf1cedf906b6e;;R088	truffle/src/main/java/org/jruby/truffle/language/RubySourceSection.java	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java
+4da4c1676fa8799a9214eb6745613cfdc4430353;;R080	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRMetaClassBody.java	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRNoProtocolMethod.java
+1477ccc5a0b2a6f277fb6c398169c4fac3c74062;;R091	truffle/src/main/java/org/jruby/truffle/parser/KeyValuePair.java	truffle/src/main/java/org/jruby/truffle/collections/Tuple.java
+65b84d2a2e25626ec5e6593289e5a1c7b13f0b38;;R066	truffle/src/main/java/org/jruby/truffle/algorithms/Random.java	truffle/src/main/java/org/jruby/truffle/algorithms/Randomizer.java
+b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R095	truffle/src/main/java/org/jruby/truffle/datastructures/BoundaryIterable.java	truffle/src/main/java/org/jruby/truffle/collections/BoundaryIterable.java
+b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R095	truffle/src/main/java/org/jruby/truffle/datastructures/BoundaryIterator.java	truffle/src/main/java/org/jruby/truffle/collections/BoundaryIterator.java
+b56a070a2695f36a7a08ed36f8e6ace4ee6f0c08;;R099	truffle/src/main/java/org/jruby/truffle/datastructures/IntHashMap.java	truffle/src/main/java/org/jruby/truffle/collections/IntHashMap.java
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgfa94ab8" class="outline-3">
+<h3 id="orgfa94ab8"><span class="section-number-3">22.3</span> Rename: what is the actual diff</h3>
+<div class="outline-text-3" id="text-22-3">
+<p>
+Example of a rename:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">git -C /tmp/jruby log -1 --raw 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep TempSource
+</pre>
+</div>
+
+<pre class="example">
+    [Truffle] Rename TempSourceSection to SourceIndexLength and move.
+:100644 100644 f06d224... 7bc9443... R087	truffle/src/main/java/org/jruby/truffle/parser/TempSourceSection.java	truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+</pre>
+
+<p>
+but the diff reports all the additions and deletions
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/jruby diff 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 -- truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java | head -10
+</pre>
+</div>
+
+<pre class="example">
+diff --git a/truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java b/truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
+deleted file mode 100644
+index 7bc9443..0000000
+--- a/truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/*
+- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved. This
+- * code is released under a tri EPL/GPL/LGPL license. You can use it,
+- * redistribute it and/or modify it under the terms of the:
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd750b3e" class="outline-2">
+<h2 id="orgd750b3e"><span class="section-number-2">23</span> git does not store diffs</h2>
+<div class="outline-text-2" id="text-23">
+<ul class="org-ul">
+<li>it computes them</li>
+<li>but it stores metadata about what the type of change a file suffered (rename, addition, deletion)</li>
+<li>even for a rename, it stores before-and-after</li>
+</ul>
+
+<p>
+you can also see the "churn" in the rename with &#x2013;numstat
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/jruby log -1 --numstat 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep TempSource
+</pre>
+</div>
+
+<pre class="example">
+    [Truffle] Rename TempSourceSection to SourceIndexLength and move.
+3	3	truffle/src/main/java/org/jruby/truffle/{parser/TempSourceSection.java =&gt; language/SourceIndexLength.java}
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgee65eb4" class="outline-2">
+<h2 id="orgee65eb4"><span class="section-number-2">24</span> Extracting versions of files</h2>
+<div class="outline-text-2" id="text-24">
+<ul class="org-ul">
+<li>Git stores the actual contents of the files: the blobs
+<ul class="org-ul">
+<li>they might be compacted (to save space)</li>
+</ul></li>
+<li><b>do not extract using git checkout</b>. 
+<ul class="org-ul">
+<li>it is very slow</li>
+<li>and it recreates the entire filesystem at the commit</li>
+</ul></li>
+<li>The &#x2013;raw option gives you the blob of a given file before and after the commit is executed:
+<ul class="org-ul">
+<li>fields after the file mode</li>
+</ul></li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git  -C /tmp/xournal log -1 --no-abbrev --raw  README
+</pre>
+</div>
+
+
+<pre class="example">
+commit ab94f7e668505f9080796a5b52cd9a00c81a9326
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Sun Jun 29 09:56:18 2014 +0200
+
+    Bump version number ahead of release 0.4.8
+
+:100644 100644 37cbe88fe37fd54433af43e61c9590a9fcfc8a76 4b2c36af80202e29b88b75d5689e125bb64b5fa4 M	README
+</pre>
+</div>
+
+
+<div id="outline-container-orgc807749" class="outline-3">
+<h3 id="orgc807749"><span class="section-number-3">24.1</span> git show</h3>
+<div class="outline-text-3" id="text-24-1">
+<p>
+You can extract the contents of file using git show in two ways: 
+</p>
+
+<ul class="org-ul">
+<li>by commit-id and filename</li>
+<li>by blob-id</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org69333c5" class="outline-3">
+<h3 id="org69333c5"><span class="section-number-3">24.2</span> cid:filename</h3>
+<div class="outline-text-3" id="text-24-2">
+<ul class="org-ul">
+<li>You need to use the filename at the time of the commit (in case it was later renamed)</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal show ab94f7e668505f9080796a5b52cd9a00c81a9326:README | head
+</pre>
+</div>
+
+<pre class="example">
+Version 0.4.8 (June 30, 2014)
+
+Installation:  see INSTALL
+User's manual: see html-doc/manual.html
+Updates:       see http://xournal.sourceforge.net/
+
+See also: http://sourceforge.net/projects/xournal
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-orgb53c77d" class="outline-3">
+<h3 id="orgb53c77d"><span class="section-number-3">24.3</span> by blob</h3>
+<div class="outline-text-3" id="text-24-3">
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal show 4b2c36af80202e29b88b75d5689e125bb64b5fa4 | head
+</pre>
+</div>
+
+<pre class="example">
+Version 0.4.8 (June 30, 2014)
+
+Installation:  see INSTALL
+User's manual: see html-doc/manual.html
+Updates:       see http://xournal.sourceforge.net/
+
+See also: http://sourceforge.net/projects/xournal
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org5402af7" class="outline-2">
+<h2 id="org5402af7"><span class="section-number-2">25</span> blobid</h2>
+<div class="outline-text-2" id="text-25">
+<p>
+Any file/directory is recorded as a hash of its contents
+</p>
+
+<ul class="org-ul">
+<li>git keeps track of the changes to the file system at each commit using this blob</li>
+<li>it removes duplicated content</li>
+<li>it makes it easy to know what a commit has changed
+<ul class="org-ul">
+<li>and retrieve it</li>
+</ul></li>
+</ul>
+</div>
+
+<div id="outline-container-orgfc4b2a7" class="outline-3">
+<h3 id="orgfc4b2a7"><span class="section-number-3">25.1</span> How the blob id is computed:</h3>
+<div class="outline-text-3" id="text-25-1">
+<p>
+(this explains why the SHA1 vulnerability is not such a big issue for git)
+</p>
+
+<ul class="org-ul">
+<li>SHA1 the concatenation of:
+<ul class="org-ul">
+<li>"blob "</li>
+<li>ASCII length of the file</li>
+<li>ASCII 0</li>
+<li>Contents</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org68c7f2e" class="outline-3">
+<h3 id="org68c7f2e"><span class="section-number-3">25.2</span> Example</h3>
+<div class="outline-text-3" id="text-25-2">
+<p>
+Compute the blob of the current version of the file README and compare it against the lastest commit on that file
+</p>
+
+<div class="org-src-container">
+<pre class="src src-perl"><span style="color: #0000FF;">use</span> <span style="color: #006699;">Digest::SHA</span> <span style="color: #66cd00;">qw</span><span style="color: #008000;">(sha1_hex)</span>;
+
+$file = <span style="color: #008000;">"README"</span>;
+<span style="color: #6434A3;">chdir</span>(<span style="color: #008000;">"/tmp/xournal"</span>);
+
+<span style="color: #8D8D84;">#</span><span style="color: #8D8D84; font-style: italic;">read contents of file</span>
+<span style="color: #0000FF;">local</span> <span style="color: #BA36A5;">$/</span>;
+<span style="color: #6434A3;">open</span>(IN, $file);
+$contents = &lt;IN&gt;;
+<span style="color: #6434A3;">close</span> IN;
+
+
+$len = <span style="color: #6434A3;">length</span>($contents);
+<span style="color: #66cd00;">print</span> sha1_hex(<span style="color: #008000;">"blob $len\0"</span> . $contents);
+</pre>
+</div>
+
+<pre class="example">
+4b2c36af80202e29b88b75d5689e125bb64b5fa4
+</pre>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal  log --no-abbrev -1 --raw README
+</pre>
+</div>
+
+<pre class="example">
+commit ab94f7e668505f9080796a5b52cd9a00c81a9326
+Author: Denis Auroux &lt;auroux@users.sourceforge.net&gt;
+Date:   Sun Jun 29 09:56:18 2014 +0200
+
+    Bump version number ahead of release 0.4.8
+
+:100644 100644 37cbe88fe37fd54433af43e61c9590a9fcfc8a76 4b2c36af80202e29b88b75d5689e125bb64b5fa4 M	README
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org9b1a142" class="outline-2">
+<h2 id="org9b1a142"><span class="section-number-2">26</span> Modifications to a file</h2>
+<div class="outline-text-2" id="text-26">
+<ul class="org-ul">
+<li>simply append the filename after the other git-log parameters</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal log --oneline --no-abbrev src/xo-file.c | head
+</pre>
+</div>
+
+<pre class="example">
+f15bc362de2c5401600c420395b765566c2152e1 config option to create new file when trying to open non-existent .xoj
+2b74a01bae6c282e12006579cf285e21c847472e Fix issues with commas in config file (bug #161)
+f305d3bee6290b9a82680a186594619b8e217740 Fix includes to avoid implicitly defined function warnings.
+982874f254c3e03d4def80c44012f1e0bd222377 disable xinput during modal dialog boxes (bug #159)
+5c74a49542ef78cc31cf9df5a1284a53513bb8b2 option to export successive layers to separate PDF pages
+ac1af31bee3cdfcc8988c193e071d10d7167dea7 use GDK macros (not WIN32) to disable X11-specific code (T. Schoonjans)
+c34acb584baf71ef00086583b80d32f84e75bde0 Fix crash in ps/pdf bitmap background import via ghostscript
+57c8488b3c6ffe94917dcc417cd0027bfc2df55c fix a minor bug with save file paths in Windows (D. German)
+2cfa0f4174ce5456e22003bde152b6609df288e4 new Export to PDF code using cairo (+ config option to prefer old code)
+ad96f4135f5138afe3d7d20d9f88ae87ea7c0cfd option to auto-save documents and recover auto-saves
+</pre>
+</div>
+
+
+<div id="outline-container-orga1aaa4b" class="outline-3">
+<h3 id="orga1aaa4b"><span class="section-number-3">26.1</span> who was the last to touch a given line?</h3>
+<div class="outline-text-3" id="text-26-1">
+<ul class="org-ul">
+<li>use git blame.</li>
+<li>It can be slow.</li>
+<li>It gives you the blame with respect to the current commit (head of the current branch). So
+make sure you run it after a checkout at the time you want to see the blame.</li>
+</ul>
+
+<p>
+By default its format is hard to parse (more on that later)
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal blame src/xo-file.c | head
+</pre>
+</div>
+
+<pre class="example">
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    1) /*
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    2)  *  This program is free software; you can redistribute it and/or
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    3)  *  modify it under the terms of the GNU General Public
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    4)  *  License as published by the Free Software Foundation; either
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    5)  *  version 2 of the License, or (at your option) any later version.
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    6)  *
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    7)  *  This software is distributed in the hope that it will be useful,
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    8)  *  but WITHOUT ANY WARRANTY; without even the implied warranty of  
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    9)  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000   10)  *  General Public License for more details.
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org6470d00" class="outline-3">
+<h3 id="org6470d00"><span class="section-number-3">26.2</span> Be careful</h3>
+<div class="outline-text-3" id="text-26-2">
+<ul class="org-ul">
+<li>In git-blame
+<ul class="org-ul">
+<li>The authors are mapped using the file .mailmap found in the root directory of the project</li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orge73a24f" class="outline-3">
+<h3 id="orge73a24f"><span class="section-number-3">26.3</span> Example 1:</h3>
+<div class="outline-text-3" id="text-26-3">
+<p>
+From the git-blame documentation:
+</p>
+
+<p>
+<b>Example:</b> Your history contains commits by two authors, Jane and Joe, whose names appear in the repository under several forms:
+</p>
+
+<pre class="example">
+Joe Developer &lt;joe@example.com&gt;
+Joe R. Developer &lt;joe@example.com&gt;
+Jane Doe &lt;jane@example.com&gt;
+Jane Doe &lt;jane@laptop.(none)&gt;
+Jane D. &lt;jane@desktop.(none)&gt;
+</pre>
+
+<p>
+Now suppose that Joe wants his middle name initial used, and Jane prefers her family name fully spelled out. A proper
+<b>.mailmap</b> file would look like:
+</p>
+
+<pre class="example">
+Jane Doe         &lt;jane@desktop.(none)&gt;
+Joe R. Developer &lt;joe@example.com&gt;
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org578d874" class="outline-3">
+<h3 id="org578d874"><span class="section-number-3">26.4</span> Example</h3>
+<div class="outline-text-3" id="text-26-4">
+<p>
+This is the top of .mailmap from the linux kernel
+</p>
+
+<pre class="example">
+#
+# This list is used by git-shortlog to fix a few botched name translations
+# in the git archive, either because the author's full name was messed up
+# and/or not always written the same way, making contributions from the
+# same person appearing not to be so or badly displayed.
+#
+p# repo-abbrev: /pub/scm/linux/kernel/git/
+#
+
+Aaron Durbin &lt;adurbin@google.com&gt;
+Adam Oldham &lt;oldhamca@gmail.com&gt;
+Adam Radford &lt;aradford@gmail.com&gt;
+Adrian Bunk &lt;bunk@stusta.de&gt;
+Adriana Reus &lt;adi.reus@gmail.com&gt; &lt;adriana.reus@intel.com&gt;
+Alan Cox &lt;alan@lxorguk.ukuu.org.uk&gt;
+</pre>
+
+<p>
+For example: 
+</p>
+
+<pre class="example">
+Adriana Reus &lt;adi.reus@gmail.com&gt; &lt;adriana.reus@intel.com&gt;
+</pre>
+
+<ul class="org-ul">
+<li>Adriana Reus email is reported different in commands that use .mailmap. 
+<ul class="org-ul">
+<li>including blame</li>
+</ul></li>
+<li><b>%an</b> returns name as in commit</li>
+<li><b>%aN</b> returns name mapped using .mailmap</li>
+<li><b>%ae</b> returns email as in commit</li>
+<li><b>%aE</b> returns email mapped using .mailmap</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-sh">git -C  /home/linux/original.repo/linux.git log --oneline --format=<span style="color: #008000;">'%H;author;%an;%ae;mailmapAuthor;%aN;%aE'</span> | grep <span style="color: #008000;">'reus'</span> | head -2
+</pre>
+</div>
+
+
+<pre class="example">
+6c55c418f071dc7df2dfeb66398d009139cc5ef1;author;Adriana Reus;adi.reus@gmail.com;mailmapAuthor;Adriana Reus;adi.reus@gmail.com
+65ae47b0ec535a008e53578abc11082f3b742f75;author;Adriana Reus;adriana.reus@intel.com;mailmapAuthor;Adriana Reus;adi.reus@gmail.com
+</pre>
+
+
+<p>
+This command uses raw user data:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C  /home/linux/original.repo/linux.git  log 65ae47b0ec535a008e53578abc11082f3b742f75 -1 | head
+</pre>
+</div>
+
+<pre class="example">
+commit 65ae47b0ec535a008e53578abc11082f3b742f75
+Author: Adriana Reus &lt;adriana.reus@intel.com&gt;
+Date:   Thu Mar 24 11:29:31 2016 +0200
+
+    iio: accel: kxcjk-1013: optimize i2c transfers in trigger handler
+    
+    Some i2c busses (e.g.: Synopsys DesignWare I2C adapter) need to
+    enable/disable the bus at each i2c transfer and must wait for
+    the enable/disable to happen before sending the data.
+</pre>
+
+<p>
+but this one uses mapped user data:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C  /home/linux/original.repo/linux.git  shortlog --email 65ae47b0ec535a008e53578abc11082f3b742f75 -1 | head
+</pre>
+</div>
+
+
+<pre class="example">
+Adriana Reus &lt;adi.reus@gmail.com&gt; (1):
+      iio: accel: kxcjk-1013: optimize i2c transfers in trigger handler
+</pre>
+</div>
+</div>
+
+
+<div id="outline-container-org73fcba5" class="outline-3">
+<h3 id="org73fcba5"><span class="section-number-3">26.5</span> git-blame and  .mailmap</h3>
+<div class="outline-text-3" id="text-26-5">
+<ul class="org-ul">
+<li>git blame maps users using .mailmap</li>
+<li>so be careful when you parse its information 
+<ul class="org-ul">
+<li>it might appear that the line is modified by the wrong person</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-orgd93c6f6" class="outline-2">
+<h2 id="orgd93c6f6"><span class="section-number-2">27</span> &#x2013;porcelain</h2>
+<div class="outline-text-2" id="text-27">
+<p>
+Many commands support &#x2013;porcelain
+</p>
+
+<blockquote>
+<p>
+"Porcelain" is the material from which toilets are usually made (and sometimes other fixtures such as washbasins). This
+is distinct from "plumbing" (the actual pipes and drains), where the porcelain provides a more user-friendly interface
+to the plumbing
+</p>
+</blockquote>
+
+<p>
+<a href="http://stackoverflow.com/questions/6976473/what-does-the-term-porcelain-mean-in-git">http://stackoverflow.com/questions/6976473/what-does-the-term-porcelain-mean-in-git</a>
+</p>
+</div>
+
+
+<div id="outline-container-orgb66f094" class="outline-3">
+<h3 id="orgb66f094"><span class="section-number-3">27.1</span> git-blame porcelain</h3>
+<div class="outline-text-3" id="text-27-1">
+<p>
+it is useful when one need to parse
+</p>
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">(author or commiter)-time</td>
+<td class="org-left">unix time in epoch</td>
+</tr>
+
+<tr>
+<td class="org-left">summary</td>
+<td class="org-left">one liner of commit log</td>
+</tr>
+
+<tr>
+<td class="org-left">filename</td>
+<td class="org-left">if file was renamed, it tells you what the original filename was</td>
+</tr>
+
+<tr>
+<td class="org-left">previous</td>
+<td class="org-left">commit responsible for the previous version of a specific line</td>
+</tr>
+
+<tr>
+<td class="org-left">\tab</td>
+<td class="org-left">actual content is preceeded by tab</td>
+</tr>
+</tbody>
+</table>
+
+
+<div class="org-src-container">
+<pre class="src src-sh">git -C /tmp/xournal blame --no-abbrev src/xo-file.c --line-porcelain | head -26
+</pre>
+</div>
+
+<pre class="example">
+a71d76854d1caabd6bcc7fd1ce6a105fca06de61 1 1 15
+author Denis Auroux
+author-mail &lt;auroux@math.berkeley.edu&gt;
+author-time 1337713609
+author-tz +0000
+committer Denis Auroux
+committer-mail &lt;auroux@math.berkeley.edu&gt;
+committer-time 1337713609
+committer-tz +0000
+summary Add "GPL v2 or later" headers to the source files
+previous c6c08ac049e4d849ca96363d8feba52c0cb8474a src/xo-file.c
+filename src/xo-file.c
+	/*
+a71d76854d1caabd6bcc7fd1ce6a105fca06de61 2 2
+author Denis Auroux
+author-mail &lt;auroux@math.berkeley.edu&gt;
+author-time 1337713609
+author-tz +0000
+committer Denis Auroux
+committer-mail &lt;auroux@math.berkeley.edu&gt;
+committer-time 1337713609
+committer-tz +0000
+summary Add "GPL v2 or later" headers to the source files
+previous c6c08ac049e4d849ca96363d8feba52c0cb8474a src/xo-file.c
+filename src/xo-file.c
+	 *  This program is free software; you can redistribute it and/or
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-org5320110" class="outline-2">
+<h2 id="org5320110"><span class="section-number-2">28</span> Final comments</h2>
+<div class="outline-text-2" id="text-28">
+<ul class="org-ul">
+<li>Read the man pages</li>
+<li>You can simplify your life by asking for the right info</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgfa0dfd2" class="outline-2">
+<h2 id="orgfa0dfd2"><span class="section-number-2">29</span> Ignore</h2>
+<div class="outline-text-2" id="text-29">
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="color: #707183;">(</span><span style="color: #0000FF;">setq</span> org-image-actual-width 1000<span style="color: #707183;">)</span>
+<span style="color: #707183;">(</span><span style="color: #0000FF;">setq</span> org-export-babel-evaluate  nil<span style="color: #707183;">)</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Daniel M. German</p>
+<p class="date">Created: 2017-03-06 Mon 13:40</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
