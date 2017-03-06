@@ -248,7 +248,7 @@ while (<>) {
 
 #+RESULTS: withCid.pl
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/repo log -2  | perl withCid.pl 
 #+END_SRC
 
@@ -278,7 +278,7 @@ cca4f20edad04decdc268102f9a6ee2e3803bcc7;;      docs/git-gc: fix default value f
 
 So now  we can extract any information we want:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/repo log -6  | perl withCid.pl | grep ';Author;' 
 #+END_SRC
 
@@ -345,7 +345,7 @@ man git-log  | egrep -A 20 'format:<string>$'
 
 or you can learn how to do it via the format option:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/repo log -6  --format='%H;%an;%ae'
 #+END_SRC
 
@@ -359,7 +359,7 @@ eccf97c386ea970cc1fa6e6387f4786d05ecd76e;Junio C Hamano;gitster@pobox.com
 c0588fd61aa6da96824eec60719c505b66239dd6;Junio C Hamano;gitster@pobox.com
 #+end_example
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/repo log -6  --format='%H;Commiter;%cn; CommiterDate;%ct'
 #+END_SRC
 
@@ -382,7 +382,7 @@ hack it as I have done it below. You could restore the semicolons once data is i
 In this example I am going to import:
  - cid, author, authoremail, authortime, committer, comitteremail, commitdate and summary
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/repo log  --format='%H<SEMI>%an<SEMI>%ae<SEMI>%at<SEMI>%cn<SEMI>%ce<SEMI>%ct<SEMI>%s' > /tmp/rip.rip
 # replace semicolons with a marker so we can import it
 perl -pe 's/;/<SEMICOLON>/g;' /tmp/rip.rip > /tmp/rip.rip2
@@ -447,7 +447,7 @@ When cloning, you get all commits in the repo, but not all the branch info
 See [[http://github.com/dmgerman/xournal]]
 
 
-#+BEGIN_SRC  sh
+#+BEGIN_SRC  sh :exports both
 cd /tmp/
 git clone http://github.com/dmgerman/xournal 
 #+END_SRC
@@ -455,7 +455,7 @@ git clone http://github.com/dmgerman/xournal
 #+RESULTS:
 
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal branch --all
 #+END_SRC
 
@@ -486,14 +486,14 @@ git -C /tmp/xournal branch --all
 
 Use fetch --all to create a nice file that has all this info
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal fetch --all
 #+END_SRC
 
 
 Then you have a file: .git/FETCH_HEAD that contains all information of branches
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 cat /tmp/xournal/.git/FETCH_HEAD  | head -5
 #+END_SRC
 
@@ -618,7 +618,7 @@ The DAG is the fundamental data structure of git
   - A branch head with children means it has been merged
 - Roots of the branches have zero parents 
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal log --pretty='%H;%P' -n 5 origin/next
 #+END_SRC
 
@@ -666,7 +666,7 @@ that the history is hard to read.
 
 - You can ask for only merges
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal log --merges -5 --glob='*' --pretty='%H %P'
 #+END_SRC
 
@@ -688,7 +688,7 @@ c08da1d700a818cada297aee949b40da780b536e 661075ab91e296fb5b702be379967bd58129094
 
 ** --numstat
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log -2 --numstat 
 #+END_SRC
 
@@ -714,7 +714,7 @@ Date:   Fri Jul 15 23:24:12 2016 +0200
 
 ** --stat
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log -2 --stat 
 #+END_SRC
 
@@ -802,7 +802,7 @@ Several issues:
 
 ** Better solution: --raw
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log -1 --no-abbrev --raw  8e7af75f1c297a0144fce9db84450d4b9fff7090
 #+END_SRC
 
@@ -840,7 +840,7 @@ but only when the merge included a patch
 
 ** Files modiefied: --name-status
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log --oneline --no-abbrev -1 --name-status 8e7af75f1c297a0144fce9db84450d4b9fff7090
 #+END_SRC
 
@@ -866,7 +866,7 @@ A	po/ja.po
 
 You can now easily preprocess the data to load it into our database
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log --oneline --no-abbrev --name-status -10  | perl withCid.pl  | egrep $';;'  | perl -pe 's/\t/;/;s/;;/;/;'
 #+END_SRC
 
@@ -899,7 +899,7 @@ this file was renamed more than once (jruby)
 truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
 #+END_EXAMPLE
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/jruby log --oneline --follow -10 -- truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java 
 #+END_SRC
 
@@ -923,7 +923,7 @@ Her is an example of how this rename is reported by different runs of git log on
 
 Using --stat
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/jruby log --oneline --no-abbrev --stat 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
@@ -936,7 +936,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --stat 745fcccc684131c16159523c277d
 
 Using --numstat
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/jruby log --oneline --no-abbrev --numstat 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
@@ -948,7 +948,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --numstat 745fcccc684131c16159523c2
 
 Using --name-status
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/jruby log --oneline --no-abbrev --name-status 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
@@ -960,7 +960,7 @@ R100	truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.
 
 Using --summary
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/jruby log --oneline --no-abbrev --summary 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
@@ -972,7 +972,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --summary 745fcccc684131c16159523c2
 
 Using --raw
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de01737d764f0 -1
 #+END_SRC
 
@@ -988,7 +988,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de
   - how similar the old and the new versions are
 - when a file is deleted and another one is added, git computes a similarity metric
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/jruby log --name-status --oneline --no-abbrev | egrep '^R'  | head -5
 #+END_SRC
 
@@ -1003,7 +1003,7 @@ R080	core/src/main/java/org/jruby/internal/runtime/methods/CompiledIRMetaClassBo
 
 Let us add the commit id using our command withCid.pl:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/jruby log --name-status --oneline --no-abbrev | perl withCid.pl | grep ';;R' | head -10
 #+END_SRC
 
@@ -1037,7 +1037,7 @@ git -C /tmp/jruby log -1 --raw 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep T
 
 but the diff reports all the additions and deletions
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/jruby diff 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 -- truffle/src/main/java/org/jruby/truffle/language/SourceIndexLength.java | head -10
 #+END_SRC
 
@@ -1063,7 +1063,7 @@ index 7bc9443..0000000
 
 you can also see the "churn" in the rename with --numstat
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/jruby log -1 --numstat 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | grep TempSource
 #+END_SRC
 
@@ -1083,7 +1083,7 @@ git -C /tmp/jruby log -1 --numstat 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | gr
 - The --raw option gives you the blob of a given file before and after the commit is executed:
   - fields after the file mode
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git  -C /tmp/xournal log -1 --no-abbrev --raw  README
 #+END_SRC
 
@@ -1111,7 +1111,7 @@ You can extract the contents of file using git show in two ways:
 
 - You need to use the filename at the time of the commit (in case it was later renamed)
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal show ab94f7e668505f9080796a5b52cd9a00c81a9326:README | head
 #+END_SRC
 
@@ -1129,7 +1129,7 @@ See also: http://sourceforge.net/projects/xournal
 
 ** by blob
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal show 4b2c36af80202e29b88b75d5689e125bb64b5fa4 | head
 #+END_SRC
 
@@ -1190,7 +1190,7 @@ print sha1_hex("blob $len\0" . $contents);
 4b2c36af80202e29b88b75d5689e125bb64b5fa4
 #+end_example
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal  log --no-abbrev -1 --raw README
 #+END_SRC
 
@@ -1210,7 +1210,7 @@ Date:   Sun Jun 29 09:56:18 2014 +0200
 
 - simply append the filename after the other git-log parameters
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal log --oneline --no-abbrev src/xo-file.c | head
 #+END_SRC
 
@@ -1238,7 +1238,7 @@ ad96f4135f5138afe3d7d20d9f88ae87ea7c0cfd option to auto-save documents and recov
 
 By default its format is hard to parse (more on that later)
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal blame src/xo-file.c | head
 #+END_SRC
 
@@ -1318,7 +1318,7 @@ Adriana Reus <adi.reus@gmail.com> <adriana.reus@intel.com>
 - *%aN* returns name mapped using .mailmap
 - *%ae* returns email as in commit
 - *%aE* returns email mapped using .mailmap
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C  /home/linux/original.repo/linux.git log --oneline --format='%H;author;%an;%ae;mailmapAuthor;%aN;%aE' | grep 'reus' | head -2
 #+END_SRC
 
@@ -1332,7 +1332,7 @@ git -C  /home/linux/original.repo/linux.git log --oneline --format='%H;author;%a
 
 This command uses raw user data:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C  /home/linux/original.repo/linux.git  log 65ae47b0ec535a008e53578abc11082f3b742f75 -1 | head
 #+END_SRC
 
@@ -1352,7 +1352,7 @@ Date:   Thu Mar 24 11:29:31 2016 +0200
 
 but this one uses mapped user data:
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C  /home/linux/original.repo/linux.git  shortlog --email 65ae47b0ec535a008e53578abc11082f3b742f75 -1 | head
 #+END_SRC
 
@@ -1396,7 +1396,7 @@ it is useful when one need to parse
 | \tab                      | actual content is preceeded by tab                               |
 
 
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :exports both
 git -C /tmp/xournal blame --no-abbrev src/xo-file.c --line-porcelain | head -26
 #+END_SRC
 
