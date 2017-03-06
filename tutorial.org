@@ -188,7 +188,7 @@ eccf97c Merge branch 'gp/document-dotfiles-in-templates-are-not-copied'
 
 ** Some important git log options: no-abbrev
 
-| --no-abbbrev | Force git to always give you full commit ids |
+| --no-abbrev  | Force git to always give you full commit ids |
 
 #+BEGIN_SRC sh :exports both
 git -C  /tmp/repo log -1 --oneline --no-abbrev -5
