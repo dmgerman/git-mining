@@ -3,7 +3,7 @@
 #+TAGS:
 #+SEQ_TODO: TODO STARTED DONE DEFERRED CANCELLED | WAITING DELEGATED APPT
 #+DRAWERS: HIDDEN STATE
-#+TITLE: Git mininig tutorial
+#+TITLE: Git mining tutorial
 #+CATEGORY: 
 #+PROPERTY: header-args: lang           :varname value
 #+PROPERTY: header-args:sqlite          :db /path/to/db  :colnames yes
