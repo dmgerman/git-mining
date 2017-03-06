@@ -616,6 +616,8 @@ HEAD is now at 031f268... merged kinetic scroll by Immi
 
 * Parents
 
+[[./dag.png]]
+
 The DAG is the fundamental data structure of git
 
 - Every commit has zero or more parents
