@@ -4,7 +4,7 @@
 #+SEQ_TODO: TODO STARTED DONE DEFERRED CANCELLED | WAITING DELEGATED APPT
 #+DRAWERS: HIDDEN STATE
 #+TITLE: Git mining tutorial
-#+CATEGORY: 
+#+CATEGORY:
 #+PROPERTY: header-args: lang           :varname value
 #+PROPERTY: header-args:sqlite          :db /path/to/db  :colnames yes
 #+PROPERTY: header-args:R               :results output
@@ -24,10 +24,10 @@ This file is information that I wish I had known when I started doing heavy mini
 - commits create a DAG
   - Each commit has one or more parents (ordered)
   - A commit with more than one parent is a merge-commit
-  
-- Most frequently the DAG is a tree 
+
+- Most frequently the DAG is a tree
   - one root commit
-  
+
 - But some projects have many roots
   - This is a *feature* of git: you can merge repos!!!
 
@@ -39,7 +39,7 @@ This file is information that I wish I had known when I started doing heavy mini
 - And metadata associated with it:
   - Who/when committed to the current repo (its committer)
   - Who/when created the commit (its author)
-  
+
 - git does not store diffs!
   - which means diffs are expensive to compute
 
@@ -50,7 +50,7 @@ This file is information that I wish I had known when I started doing heavy mini
 
 * Merge commits
 
-- Merge commits have multiple parents. 
+- Merge commits have multiple parents.
 
 - Merges with more than 2 parents are called /octupus/ merge
   - From Linus, regarding an octupus merge in the Kernel (Jan 2014).
@@ -99,7 +99,7 @@ This creates a file called .git/FETCH_HEAD. It contains
 - location
 
 #+BEGIN_SRC sh :exports both
-head /tmp/repo/.git/FETCH_HEAD 
+head /tmp/repo/.git/FETCH_HEAD
 #+END_SRC
 
 #+RESULTS:
@@ -158,7 +158,7 @@ Author: Junio C Hamano <gitster@pobox.com>
 Date:   Fri Feb 24 10:49:58 2017 -0800
 
     Git 2.12
-    
+
     Signed-off-by: Junio C Hamano <gitster@pobox.com>
 
 commit cca4f20edad04decdc268102f9a6ee2e3803bcc7
@@ -167,16 +167,16 @@ Author: Junio C Hamano <gitster@pobox.com>
 Date:   Fri Feb 24 10:48:10 2017 -0800
 
     Merge branch 'ps/doc-gc-aggressive-depth-update'
-    
+
     Doc update.
-    
+
     * ps/doc-gc-aggressive-depth-update:
       docs/git-gc: fix default value for `--aggressiveDepth`
 #+end_example
 
 ** Some important git log options: oneline
 
-| --oneline    | one commit per line. 
+| --oneline    | one commit per line.
 
 #+BEGIN_SRC sh :exports both
 git -C  /tmp/repo log --oneline -5
@@ -215,13 +215,13 @@ eccf97c386ea970cc1fa6e6387f4786d05ecd76e Merge branch 'gp/document-dotfiles-in-t
 This program will:
 
 - replace any semicolon in the input with <SEMICOLON>
-- every input line is converted to a "record": 
+- every input line is converted to a "record":
   - separator ";"
   - first field: commitid
   - second field: name of header field, empty for body
   - third field: contents of field
 - a line starting with "commit <cid> " or "<cid> " will be considered a new commit
-  
+
 #+name: withCid.pl
 #+BEGIN_SRC perl :tangle withCid.pl
 #!/usr/bin/perl
@@ -231,14 +231,14 @@ my $cid;
 while (<>) {
     chomp;
     s/;/<SEMICOLON>/g;
-    
-    if (/^commit ([0-9a-f]{40}) *(.*)$/) { 
+
+    if (/^commit ([0-9a-f]{40}) *(.*)$/) {
         # match commit id
-        $cid = $1; 
+        $cid = $1;
         print "$1;$2\n";
     } elsif (/^([0-9a-f]{40}) *(.*)$/) {
         # --abbrev does not include commit
-        $cid = $1; 
+        $cid = $1;
         print "$1;$2\n";
     } else {
         if (/^(\S+):\s+(.*)$/) {
@@ -255,7 +255,7 @@ while (<>) {
 #+RESULTS: withCid.pl
 
 #+BEGIN_SRC sh :exports both
-git -C /tmp/repo log -2  | perl withCid.pl 
+git -C /tmp/repo log -2  | perl withCid.pl
 #+END_SRC
 
 #+RESULTS:
@@ -265,7 +265,7 @@ e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Author;Junio C Hamano <gitster@pobox.co
 e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;Date;Fri Feb 24 10:49:58 2017 -0800
 e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
 e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    Git 2.12
-e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    
+e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
 e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;    Signed-off-by: Junio C Hamano <gitster@pobox.com>
 e7e07d5a4fcc2a203d9873968ad3e6bd4d7419d7;;
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;
@@ -274,9 +274,9 @@ cca4f20edad04decdc268102f9a6ee2e3803bcc7;Author;Junio C Hamano <gitster@pobox.co
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;Date;Fri Feb 24 10:48:10 2017 -0800
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;;
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    Merge branch 'ps/doc-gc-aggressive-depth-update'
-cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    Doc update.
-cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    
+cca4f20edad04decdc268102f9a6ee2e3803bcc7;;
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;;    * ps/doc-gc-aggressive-depth-update:
 cca4f20edad04decdc268102f9a6ee2e3803bcc7;;      docs/git-gc: fix default value for `--aggressiveDepth`
 #+end_example
@@ -285,7 +285,7 @@ cca4f20edad04decdc268102f9a6ee2e3803bcc7;;      docs/git-gc: fix default value f
 So now  we can extract any information we want:
 
 #+BEGIN_SRC sh :exports both
-git -C /tmp/repo log -6  | perl withCid.pl | grep ';Author;' 
+git -C /tmp/repo log -6  | perl withCid.pl | grep ';Author;'
 #+END_SRC
 
 #+RESULTS:
@@ -400,7 +400,7 @@ perl -pe 's/<SEMI>/;/g' /tmp/rip.rip2 > /tmp/rip.rip3
 
 #+BEGIN_SRC sqlite :db /tmp/mydb.sql :exports both
 drop table if exists commits;
-create table commits(cid varchar, author varchar, authoremail varchar, authortime int, 
+create table commits(cid varchar, author varchar, authoremail varchar, authortime int,
                      committer varchar, commiteremail varchar, commitdate int, summary varchar);
 .mode csv commits
 .separator ;
@@ -455,7 +455,7 @@ See [[http://github.com/dmgerman/xournal]]
 
 #+BEGIN_SRC  sh :exports both
 cd /tmp/
-git clone http://github.com/dmgerman/xournal 
+git clone http://github.com/dmgerman/xournal
 #+END_SRC
 
 #+RESULTS:
@@ -573,7 +573,7 @@ Date:   Sun Sep 11 22:16:02 2016 -0700
 if you want all commits, then use glob='*'
 
 - includes all branches
-  - even "detached branches" 
+  - even "detached branches"
 - irrespective to current commit
 
 #+BEGIN_SRC sh :cmdline -v :exports both
@@ -624,7 +624,7 @@ The DAG is the fundamental data structure of git
 - Current heads of branches (including master) might have zero children
   - At least one branch will always have zero children
   - A branch head with children means it has been merged
-- Roots of the branches have zero parents 
+- Roots of the branches have zero parents
 
 #+BEGIN_SRC sh :exports both
 git -C /tmp/xournal log --pretty='%H;%P' -n 5 origin/next
@@ -662,7 +662,7 @@ that the history is hard to read.
 - Parents are ordered
   - First parent determines the branch in which the merge was applied
   - Merging strategy determines how to resolve merges (an option of git merge)
-  - If the merge has a patch associated with it, 
+  - If the merge has a patch associated with it,
     - then there was a merge conflict and that patch is the manual fix
 
 * Roots:
@@ -703,7 +703,7 @@ c08da1d700a818cada297aee949b40da780b536e 661075ab91e296fb5b702be379967bd58129094
 ** --numstat
 
 #+BEGIN_SRC sh :exports both
-git  -C /tmp/xournal log -2 --numstat 
+git  -C /tmp/xournal log -2 --numstat
 #+END_SRC
 
 #+RESULTS:
@@ -729,7 +729,7 @@ Date:   Fri Jul 15 23:24:12 2016 +0200
 ** --stat
 
 #+BEGIN_SRC sh :exports both
-git  -C /tmp/xournal log -2 --stat 
+git  -C /tmp/xournal log -2 --stat
 #+END_SRC
 
 #+RESULTS:
@@ -872,10 +872,10 @@ A	po/ja.po
 - Subset info of --raw
 - Easier to parse
 
-** When to use 
+** When to use
 
 - *--numstat/--stat*: When you need the "churn"
-- *--raw*: when you need the files that were modified/added/removed 
+- *--raw*: when you need the files that were modified/added/removed
 
 
 You can now easily preprocess the data to load it into our database
@@ -914,7 +914,7 @@ truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
 #+END_EXAMPLE
 
 #+BEGIN_SRC sh :exports both
-git -C /tmp/jruby log --oneline --follow -10 -- truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java 
+git -C /tmp/jruby log --oneline --follow -10 -- truffle/src/main/java/org/jruby/truffle/platform/posix/TrufflePOSIXHandler.java
 #+END_SRC
 
 #+RESULTS:
@@ -998,7 +998,7 @@ git  -C /tmp/jruby log --oneline --no-abbrev --raw 745fcccc684131c16159523c277de
 
 ** Renames.. that R...
 
-- What is that number after the R? 
+- What is that number after the R?
   - how similar the old and the new versions are
 - when a file is deleted and another one is added, git computes a similarity metric
 
@@ -1072,8 +1072,8 @@ index 7bc9443..0000000
 * git does not store diffs
 
 - it computes them
-- but it stores metadata about what the type of change a file suffered (rename, addition, deletion)
-- even for a rename, it stores before-and-after
+- but it stores metadata about what the type of change a file suffered (addition, deletion)
+- renames are stored as "before" and "after" and detected at "query" time
 
 you can also see the "churn" in the rename with --numstat
 
@@ -1091,7 +1091,7 @@ git -C /tmp/jruby log -1 --numstat 62068e649dbd1f6d923de8cc52f2ff6fc0b65463 | gr
 
 - Git stores the actual contents of the files: the blobs
   - they might be compacted (to save space)
-- *do not extract using git checkout*. 
+- *do not extract using git checkout*.
   - it is very slow
   - and it recreates the entire filesystem at the commit
 - The --raw option gives you the blob of a given file before and after the commit is executed:
@@ -1116,12 +1116,12 @@ Date:   Sun Jun 29 09:56:18 2014 +0200
 
 ** git show
 
-You can extract the contents of file using git show in two ways: 
+You can extract the contents of file using git show in two ways:
 
 - by commit-id and filename
 - by blob-id
 
-** cid:filename 
+** cid:filename
 
 - You need to use the filename at the time of the commit (in case it was later renamed)
 
@@ -1177,7 +1177,7 @@ Any file/directory is recorded as a hash of its contents
   - ASCII 0
   - Contents
 
-** Example 
+** Example
 
 Compute the blob of the current version of the file README and compare it against the lastest commit on that file
 
@@ -1244,8 +1244,8 @@ ad96f4135f5138afe3d7d20d9f88ae87ea7c0cfd option to auto-save documents and recov
 
 ** who was the last to touch a given line?
 
-- use git blame. 
-- It can be slow. 
+- use git blame.
+- It can be slow.
 - It gives you the blame with respect to the current commit (head of the current branch). So
   make sure you run it after a checkout at the time you want to see the blame.
 
@@ -1264,7 +1264,7 @@ a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    4)  *  License as published 
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    5)  *  version 2 of the License, or (at your option) any later version.
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    6)  *
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    7)  *  This software is distributed in the hope that it will be useful,
-a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    8)  *  but WITHOUT ANY WARRANTY; without even the implied warranty of  
+a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    8)  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000    9)  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 a71d7685 (Denis Auroux 2012-05-22 19:06:49 +0000   10)  *  General Public License for more details.
 #+end_example
@@ -1295,13 +1295,13 @@ Now suppose that Joe wants his middle name initial used, and Jane prefers her fa
 Jane Doe         <jane@desktop.(none)>
 Joe R. Developer <joe@example.com>
 #+END_EXAMPLE
-         
+
 
 ** Example
 
 This is the top of .mailmap from the linux kernel
 
-#+BEGIN_SRC 
+#+BEGIN_SRC
 #
 # This list is used by git-shortlog to fix a few botched name translations
 # in the git archive, either because the author's full name was messed up
@@ -1319,13 +1319,13 @@ Adriana Reus <adi.reus@gmail.com> <adriana.reus@intel.com>
 Alan Cox <alan@lxorguk.ukuu.org.uk>
 #+END_SRC
 
-For example: 
+For example:
 
 #+BEGIN_EXAMPLE
 Adriana Reus <adi.reus@gmail.com> <adriana.reus@intel.com>
 #+END_EXAMPLE
 
-- Adriana Reus email is reported different in commands that use .mailmap. 
+- Adriana Reus email is reported different in commands that use .mailmap.
   - including blame
 - *%an* returns name as in commit
 - *%aN* returns name mapped using .mailmap
@@ -1356,11 +1356,11 @@ Author: Adriana Reus <adriana.reus@intel.com>
 Date:   Thu Mar 24 11:29:31 2016 +0200
 
     iio: accel: kxcjk-1013: optimize i2c transfers in trigger handler
-    
+
     Some i2c busses (e.g.: Synopsys DesignWare I2C adapter) need to
     enable/disable the bus at each i2c transfer and must wait for
     the enable/disable to happen before sending the data.
-    
+
 #+end_example
 
 but this one uses mapped user data:
@@ -1381,7 +1381,7 @@ Adriana Reus <adi.reus@gmail.com> (1):
 ** git-blame and  .mailmap
 
 - git blame maps users using .mailmap
-- so be careful when you parse its information 
+- so be careful when you parse its information
   - it might appear that the line is modified by the wrong person
 
 
@@ -1447,7 +1447,7 @@ filename src/xo-file.c
 * Final comments
 
 - Read the man pages
-- You can simplify your life by asking for the right info 
+- You can simplify your life by asking for the right info
 
 * Ignore
 
